@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="hr">
+<head>
+    <meta charset="UTF-8">
+    <title>GIP Gospić - Službeni Rezultati i Zapisnik MO</title>
+    <style>
+/* Skriva cijelo tijelo stranice dok se lozinka ne potvrdi */
+body {
+    display: none;
+}
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 30px; background-color: #f4f6f9; color: #333; }
+        .container { max-width: 1000px; margin: 0 auto; background: white; padding: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border-radius: 8px; border-top: 6px solid #1a365d; }
+        h1, h2, h3 { color: #1a365d; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; margin-top: 25px; }
+        h1 { margin-top: 0; font-size: 24px; }
+        .form-group { margin-bottom: 15px; display: flex; flex-direction: column; }
+        label { font-weight: bold; margin-bottom: 5px; color: #4a5568; font-size: 14px; }
+        input, select { padding: 10px; border: 1px solid #cbd5e0; border-radius: 4px; font-size: 15px; background-color: #fff; }
+        input:focus, select:focus { border-color: #2b6cb0; outline: none; box-shadow: 0 0 0 3px rgba(66,153,225,0.5); }
+        .row { display: flex; gap: 15px; margin-bottom: 10px; flex-wrap: wrap; }
+        .col { flex: 1; min-width: 180px; }
+        .stat-box { background: #edf2f7; padding: 15px; border-radius: 6px; margin-bottom: 20px; border: 1px solid #e2e8f0; }
+        button { background-color: #1a365d; color: white; padding: 12px 24px; border: none; border-radius: 4px; font-size: 16px; cursor: pointer; font-weight: bold; transition: background 0.2s; }
+        button:hover { background-color: #2c5282; }
+        .lista-card { background: #f7fafc; padding: 12px; border: 1px solid #e2e8f0; border-radius: 6px; margin-bottom: 10px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; background: white; font-size: 14px; }
+        th, td { border: 1px solid #cbd5e0; padding: 10px; text-align: left; }
+        th { background-color: #ebf8ff; color: #2c5282; font-weight: bold; }
+        .mandat-badge { background-color: #48bb78; color: white; padding: 3px 8px; border-radius: 4px; font-weight: bold; }
+/* Stil za footer na ekranu */
+.sustav-footer {
+    text-align: center;
+    padding: 20px 0 10px 0;
+    font-size: 13px;
+    color: #718096;
+    border-top: 1px solid #e2e8f0;
+    margin-top: 40px;
+}
+
+/* Osiguravanje da se footer sakrije prilikom ispisa/printanja */
+@media print {
+    .sustav-footer {
+        display: none !important;
+    }
+}        
+
+        /* ZAPISNIK ZA ISPIS */
+        #zapisnik-print { display: none; background: white; padding: 20px; color: #000; line-height: 1.5; font-size: 14px; }
+        #zapisnik-print table { font-size: 13px; margin-top: 10px; margin-bottom: 15px; width: 100%; border-collapse: collapse; }
+        #zapisnik-print th, #zapisnik-print td { border: 1px solid #000; padding: 8px; text-align: left; }
+        #zapisnik-print th { background-color: #f2f2f2; color: #000; font-weight: bold; }
+        
+        /* Povećana gornja margina i centrirani rimski brojevi */
+        .print-header-memorandum { margin-top: 50px; line-height: 1.3; margin-bottom: 20px; }
+        .print-section-title { font-weight: bold; margin-top: 25px; margin-bottom: 8px; font-size: 15px; text-align: center; }
+        
+        @media print {
+            body { background: white; margin: 0; }
+            .container { display: none; }
+            #zapisnik-print { display: block; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Grad Gospić — Obrada rezultata izbora za članove vijeća mjesnih odbora</h1>
+    
+    <h3>1. Opći podaci i klasifikacijske oznake</h3>
+    <div class="row">
+        <div class="col form-group" style="flex: 2;">
+            <label for="odabirMO">Odaberite Mjesni odbor:</label>
+            <select id="odabirMO" onchange="ucitajListeMO()">
+                <option value="">-- Odaberite s popisa --</option>
+            </select>
+        </div>
+        <div class="col form-group">
+            <label for="brojMandata">Broj članova vijeća:</label>
+            <input type="number" id="brojMandata" value="5" min="1">
+        </div>
+        <div class="col form-group">
+            <label for="izborniPrag">Izborni prag (%):</label>
+            <input type="number" id="izborniPrag" value="5" min="0" max="100">
+        </div>
+    </div>
+    <div class="row">
+        <div class="col form-group">
+            <label for="inputKlasa">KLASA:</label>
+            <input type="text" id="inputKlasa">
+        </div>
+        <div class="col form-group">
+            <label for="inputUrbroj">URBROJ:</label>
+            <input type="text" id="inputUrbroj">
+        </div>
+        <div class="col form-group">
+            <label for="inputDatum">Datum zapisnika:</label>
+            <input type="text" id="inputDatum" value="01. lipnja 2026.">
+        </div>
+    </div>
+
+    <div id="glavnaSekcija" style="display: none;">
+        <h3>2. Statistički podaci o glasačkim listićima i biračima</h3>
+        <div class="stat-box">
+            <div class="row">
+                <div class="col form-group">
+                    <label for="statPreuzeto">Preuzeto glasačkih listića:</label>
+                    <input type="number" id="statPreuzeto" value="0" min="0">
+                </div>
+                <div class="col form-group">
+                    <label for="statNeupotrebljeno">Broj neupotrijebljenih glasačkih listića:</label>
+                    <input type="number" id="statNeupotrebljeno" value="0" min="0">
+                </div>
+                <div class="col form-group">
+                    <label for="statUpisano">Ukupno upisano birača na ovom području:</label>
+                    <input type="number" id="statUpisano" value="0" min="0">
+                </div>
+            </div>
+            <div class="row">
+                <div class="col form-group">
+                    <label for="statGlasovalo">Glasovalo birača prema izvatku iz popisa:</label>
+                    <input type="number" id="statGlasovalo" value="0" min="0">
+                </div>
+                <div class="col form-group">
+                    <label for="statPotvrde">Glasovalo temeljem potvrde o upisu:</label>
+                    <input type="number" id="statPotvrde" value="0" min="0">
+                </div>
+                <div class="col form-group">
+                    <label for="statNevažeći">Broj nevažećih glasačkih listića:</label>
+                    <input type="number" id="statNevažeći" value="0" min="0">
+                </div>
+            </div>
+        </div>
+
+        <h3>3. Broj glasova po kandidacijskim listama</h3>
+        <div id="listeContainer"></div>
+        
+        <div style="margin-top: 20px;">
+            <button type="button" onclick="obradiIzborneRezultate()">Izračunaj rezultate i kreiraj Zapisnik</button>
+        </div>
+    </div>
+
+    <div id="rezultatiSekcija" style="display:none; margin-top: 30px;">
+        <h2>Kontrolni prikaz izračuna</h2>
+        <table id="tablicaRezultata">
+            <thead>
+                <tr>
+                    <th>Kandidacijska lista</th>
+                    <th>Broj glasova</th>
+                    <th>Postotak</th>
+                    <th>Prešao prag?</th>
+                    <th>Mandati</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+        
+        <div style="margin-top: 20px; background: #e6fffa; padding: 15px; border-left: 4px solid #319795; border-radius: 4px;">
+    <p style="margin: 0; font-weight: bold; color: #234e52;">Službeno rješenje o rezultatima je uspješno generirano i popunjeno u pozadini. Odaberite akciju:</p>
+    <div style="display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap;">
+        <button type="button" style="background-color: #319795;" onclick="osvjeziIPrintaj()">1. Ispis / Spremi u PDF</button>
+        <button type="button" style="background-color: #1a365d;" onclick="izveziZapisnikUWord()">2. Preuzmi kao Word (.doc)</button>
+    </div>
+</div>
+    </div>
+</div>
+
+<div class="sustav-footer">
+    &copy; 2026. Josip Kovačević
+</div>
+<div id="zapisnik-print">
+    <div class="print-header-memorandum">
+        REPUBLIKA HRVATSKA<br>
+        LIČKO-SENJSKA ŽUPANIJA<br>
+        <strong>GRAD GOSPIĆ</strong><br>
+        <strong>Gradsko izborno povjerenstvo</strong><br>
+        KLASA: <span id="p_klasa">-</span><br>
+        URBROJ: <span id="p_urbroj">-</span><br>
+        Gospić, <span id="p_datum">-</span>
+    </div>
+
+    <p style="text-align: justify;">
+        Na temelju Odluke o izboru članova vijeća mjesnih odbora na području Grada Gospića („Službeni vjesnik Grada Gospića" br. 2/15, 4/19, 3/20 i 4/26), nakon provedenih izbora za članice/članove vijeća mjesnih odbora, Gradsko izborno povjerenstvo utvrđuje i objavljuje
+    </p>
+
+    <div style="text-align: center; margin: 25px 0;">
+        <strong style="font-size: 15px; letter-spacing: 0.5px;">REZULTATE IZBORA ZA ČLANICE/ČLANOVE VIJEĆA</strong><br>
+        <strong id="p_naslovMO" style="font-size: 17px; text-transform: uppercase;">MJESNOG ODBORA -</strong>
+    </div>
+
+    <div class="print-section-title">I.</div>
+    <table>
+        <tbody>
+            <tr>
+                <td>Birački odbor preuzeo je ukupno glasačkih listića</td>
+                <td style="text-align: right; font-weight: bold; width: 100px;" id="p_preuzeto">-</td>
+            </tr>
+            <tr>
+                <td>Broj neupotrijebljenih glasačkih listića</td>
+                <td style="text-align: right;" id="p_neupotrijebljeno">-</td>
+            </tr>
+            <tr>
+                <td>Ukupno upisano birača na ovom području</td>
+                <td style="text-align: right; font-weight: bold;" id="p_upisano">-</td>
+            </tr>
+            <tr>
+                <td>Glasovalo birača prema izvatku iz popisa birača</td>
+                <td style="text-align: right;" id="p_glasovalo">-</td>
+            </tr>
+            <tr>
+                <td>Glasovalo birača temeljem potvrde o upisu u popis birača</td>
+                <td style="text-align: right;" id="p_potvrde">-</td>
+            </tr>
+            <tr>
+                <td>Ukupno glasovalo birača (prema listićima u kutiji)</td>
+                <td style="text-align: right; font-weight: bold;" id="p_ukupnoGlasovalo">-</td>
+            </tr>
+            <tr>
+                <td>Broj važećih glasačkih listića</td>
+                <td style="text-align: right; color: #000; font-weight: bold;" id="p_vazeci">-</td>
+            </tr>
+            <tr>
+                <td>Broj nevažećih glasačkih listića</td>
+                <td style="text-align: right; color: #000;" id="p_nevazeci">-</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="print-section-title">II.</div>
+    <p style="margin-bottom: 5px;">Pojedine kandidacijske liste dobile su sljedeći broj glasova:</p>
+    <table>
+        <thead>
+            <tr>
+                <th>Naziv kandidacijske liste i nositelj</th>
+                <th style="text-align: right; width: 110px;">Broj glasova</th>
+                <th style="text-align: right; width: 100px;">Postotak</th>
+                <th style="text-align: center; width: 130px;">Osvojeno 5% glasova</th>
+            </tr>
+        </thead>
+        <tbody id="p_tablica_glasovi_body"></tbody>
+    </table>
+
+    <div class="print-section-title">III.</div>
+    <p style="margin-bottom: 5px;">Na temelju Odluke, kandidacijske liste koje sudjeluju u diobi mjesta u vijeću mjesnog odbora ostvarile su sljedeće rezultate dijeljenja i brojeve mandata:</p>
+    <table>
+        <thead>
+            <tr>
+                <th>Kandidacijska lista koja je prešla prag</th>
+                <th style="text-align: right; width: 120px;">Ukupno glasova</th>
+                <th style="text-align: right; width: 150px;">Zadnji izborni količnik</th>
+                <th style="text-align: center; width: 150px;">BROJ ČLANOVA VIJEĆA</th>
+            </tr>
+        </thead>
+        <tbody id="p_tablica_dioba_body"></tbody>
+    </table>
+    <p>Zajednički djelitelj (granični količnik) za izračun vijećničkih mandata iznosi: <strong id="p_zajednickiDjelitelj">-</strong></p>
+
+    <div class="print-section-title">IV.</div>
+    <p style="margin-bottom: 10px; text-align: justify;">Na temelju utvrđenih rezultata izbora, u vijeće Mjesnog odbora izabrani su sljedeći članovi s pripadajućih lista sukladno ostvarenom poretku:</p>
+    
+    <div id="p_sekcija_osvojeni_mandati" style="background: white; padding-left: 5px; line-height: 1.6; text-align: justify;"></div>
+    
+    <div style="margin-top: 60px; display: flex; justify-content: space-between;">
+        <div>
+            <p>U Gospiću, <span id="p_datum_potpis">-</span></p>
+        </div>
+        <div style="text-align: center; width: 300px;">
+            <p>Predsjednica izbornog povjerenstva:</p>
+            <p style="margin-top: 45px;">___________________________________</p>
+            <p><strong>Mirjana Kosanović, dipl.iur., v.r.</strong></p>
+        </div>
+    </div>
+</div>
+
+<script>
+// Funkcija za provjeru lozinke koja se pokreće odmah
+(function() {
+    const točnaLozinka = "gipGospic2026"; // <-- Ovdje upišite lozinku koju želite!
+    let unesenaLozinka = prompt("Sustav za obradu izbora MO Grad Gospić\n\nMolimo unesite lozinku za pristup:");
+
+    if (unesenaLozinka === točnaLozinka) {
+        // Ako je lozinka točna, dopusti prikaz stranice
+        document.documentElement.style.display = "block";
+        document.body.style.display = "block";
+    } else {
+        // Ako je lozinka kriva, blokiraj pristup
+        alert("Nestačna lozinka! Pristup je odbijen.");
+        document.innerHTML = "";
+        window.stop(); // Zaustavlja daljnje učitavanje skripte
+    }
+})();
+const podaciIzbora = {
+    "ALEKSINICA": { klasa: "012-02/26-01/27", urbroj: "2125-1-01-26-4", liste: [
+        { naziv: "HRVATSKA DEMOKRATSKA ZAJEDNICA - HDZ", nositelj: "JURAJ VRKLJAN", kandidati: ["1. Juraj Vrkljan, Hrvat, Aleksinica, Aleksinica 44, rođ. 05. 11. 1985. god, OIB: 23831560788, M", "2. Milan Butorac, Hrvat Aleksinica, Aleksinica 105, rođ. 23. 03. 1966. god., OIB: 95421587334. M", "3. Josip Rukavina, Hrvat, Vaganac, Vaganac 28, rođ. 05. 01. 1981. god., OIB: 38349880975, M", "4. Ivana Marinić, Hrvatica, Aleksinica, Aleksinica 1F, rođ. 25. 12. 2003. god., OIB: 30511521586, Ž", "5.Ivica Šnjarić, Hrvat, Vaganac, Vaganac 40A, rođ. 08. 09. 1987. god., OIB: 92677768160, M"] },
+        { naziv: "KANDIDACIJSKA LISTA GRUPE BIRAČA MJESNOG ODBORA ALEKSINICA", nositelj: "IVAN RUŽIĆ", kandidati: ["1. Ivan Ružić, Hrvat, Aleksinica, Aleksinica 1B, rođ. 22. 06. 1998. god, OIB: 80750422521, M", "2. Marina Marković, Hrvatica, Aleksinica, Aleksinica 1, rođ. 07. 05. 1982. god., OIB: 92431924740. Ž", "3. Dora Mitić, Hrvatica, Aleksinica, Aleksinica 99, rođ. 15. 04. 1993. god., OIB: 78931644191, Ž", "4. Stjepan Popović, Hrvat, Vaganac, Vaganac 8, rođ. 20. 04. 1985. god., OIB: 24078995464, M", "5. Josipa Šnjarić, Hrvatica, Vaganac, Vaganac 5, rođ. 05. 07. 1980. god., OIB: 45997472044, Ž"] }
+    ]},
+    "BARLETE": { klasa: "012-02/26-01/44", urbroj: "2125-1-01-26-3", liste: [
+        { naziv: "LiPO", nositelj: "JAKOV KRMPOTIĆ", kandidati: ["1. Jakov Krmpotić, Hrvat, Barlete, Barlete 37, rođ. 02. 01. 1957. god., OIB: 66993685293, M", "2. Marko Butorac, Hrvat, Barlete, Barlete 51, rođ. 25. 03. 1988. god., OIB: 02949429093, M", "3. Mile Žagar, Hrvat, Barlete, Barlete 20, rođ. 09. 01. 1991. god., OIB: 14198966324, M", "4. Josipa Šerić, Hrvatica, Barlete, Barlete 6, rođ. 31. 01. 1997. god., OIB: 04676910309, Ž", "5. Josip Šerić, Hrvat, Barlete, Barlete 1, rođ. 19. 02. 1965. god., OIB: 57250271834, M"] }
+    ]},
+    "BILAJ": { klasa: "012-02/26-01/18", urbroj: "2125-1-01-26-5", liste: [
+        { naziv: "HRVATSKA DEMOKRATSKA ZAJEDNICA - HDZ", nositelj: "JOSIP MRAOVIĆ", kandidati: ["1. Josip Mraović, Hrvat, Novoselo Bilajsko, Novoselo Bilajsko 23/4, rođ. 18. 11. 1998. god., OIB: 35689764118, M", "2. Mirko Medunić, Hrvat, Bilaj, Bilaj 49, rođ. 21. 08. 1962. god., OIB: 30473931730, M", "3. Marijan Krmpotić, Hrvat, Bilaj, Bilaj 55, rođ. 13. 11. 1965. god. OIB: 30361535043, M", "4. Ivan Mraović, Hrvat, Bilaj, Bilaj 106 A, rođ. 16. 05. 1991. god, OIB: 17382260579, M", "5. Ankica Valentić, Hrvatica, Bilaj, Bilaj 32, rođ. 25. 06. 1965. god., OIB: 36170954382, Ž"] },
+        { naziv: "LiPO", nositelj: "MARIO BRIGADIR", kandidati: ["1. Mario Brigadir, Hrvat, Bilaj, Bilaj 18, rođ. 09. 03. 1976. god., OIB: 92354492434, M", "2. Ivica Šimunić, Hrvat, Bilaj, Bilaj 14, rođ. 22. 09. 1966. god., OIB: 74661659488, M", "3. Stanko Šimunić, Hrvat, Novoselo Bilajsko, Novoselo Bilajsko 22/3 rođ. 17. 07. 1964. god. OIB: 29870492209, M", "4. Boris Rustija, Hrvat, Bilaj, Bilaj 75, rođ. 17. 01. 1991. god, OIB: 83846493314, M", "5. Josip Popravak, Hrvat Bilaj, Bilaj 19, rođ. 24. 12. 1979. god., OIB: 75416874391, M"] },
+        { naziv: "KANDIDACIJSKA LISTA GRUPE BIRAČA MJESNOG ODBORA BILAJ", nositelj: "MIHAEL PODNAR, mag.edu.hist.", kandidati: ["1. Mihael Podnar, mag.edu.hist., Hrvat, Bilaj, Bilaj 21, rođ. 01. 01. 2000. god., OIB: 06563986738, M", "2. Nikola Ilić, Hrvat, Bilaj, Bilaj 105, rođ. 05. 12. 1952. god., OIB: 37256311157, M", "3. Milka Martinović, Hrvatica, Novoselo Bilajsko, Novoselo Bilajsko 1 A, rođ. 27. 04. 1965. god. OIB: 00191779659, Ž", "4. Branka Mraović, Hrvatica, Bilaj, Bilaj 19, rođ. 16. 07. 1983. god, OIB: 30867173645, Ž", "5.  Mile Ilić, Hrvat, Bilaj, Bilaj 3, rođ. 14. 10. 1950. god., OIB: 51208294364, M"] }
+    ]},
+    "BRUŠANE": { klasa: "012-02/26-01/28", urbroj: "2125-1-01-26-4", liste: [
+        { naziv: "HRVATSKA DEMOKRATSKA ZAJEDNICA - HDZ", nositelj: "IVANA MIŠKULIN", kandidati: ["1. Ivana Miškulin, Hrvatica, Brušane, Brušane 83 A, rođ. 25. 02. 1975. god., OIB: 75251443118, Ž", "2. Milan Sudar, Hrvat, Brušane, Brušane 11A, rođ. 18. 09. 1988., OIB: 71450739437, M", "3. Miroslav Cindrić, Hrvat, Brušane, Brušane 1, rođ. 15. 06. 1961. god., OIB: 32797251282, M", "4. Milan Ivančić, Hrvat, Brušane, Brušane 80 A, rođ. 16. 10. 1988. god., OIB: 22730579330, M", "5. Ljiljana Maras, Hrvatica, Brušane, Brušane 63, rođ. 23. 08. 1961. god., OIB: 42073704198, Ž"] },
+        { naziv: "LiPO", nositelj: "MILAN MARAS", kandidati: ["1. Milan Maras, Hrvat, Rizvanuša, Rizvanuša 11, rođ. 28. 10. 1955. god., OIB: 69914860102, M", "2. Milan Sudar, Hrvat, Brušane, Brušane 15, rođ. 03. 10. 1957., OIB: 21298789817, M", "3. Mario Sanković, Hrvat, Brušane, Brušane 90, rođ. 03. 06. 1984. god., OIB: 43003644118, M", "4. Ivica Šuper, Hrvat, Brušane, Brušane 32B, rođ. 17. 02. 1949. god., OIB: 52341695914, M", "5. Mile Abramović, Hrvat, Brušane, Brušane 5, rođ. 15. 09. 1950. god., OIB: 31154616094, M"] }
+    ]},
+    "BUDAK": { klasa: "012-02/26-01/29", urbroj: "2125-1-01-26-4", liste: [
+        { naziv: "HRVATSKA DEMOKRATSKA ZAJEDNICA - HDZ", nositelj: "BOŽIDAR NIKŠIĆ", kandidati: ["1. Božidar Nikšić, Hrvat, Budak, Budak 126 A, rođ. 06. 11. 1985. god., OIB: 71170486648, M", "2. Milan Fajdić, Hrvat, Budak, Budak 118, rođ. 03. 07. 1972. god., OIB: 44441401212, M", "3. Marijan Jamičić, Hrvat, Budak, Budak 93, rođ. 11. 05. 1973. god., OIB: 87768406365, M", "4. Mate Vuković, Hrvat, Budak, Budak 132, rođ. 17. 05. 1978. god., OIB: 05680416299, M", "5. Alen Laptoš, Hrvat, Budak, Budak 91/1, rođ. 01. 08. 1979. god., OIB: 95277469773, M"] },
+        { naziv: "LiPO", nositelj: "DRAGANA SOKOLIĆ", kandidati: ["1. Dragana Sokolić, Hrvatica, Budak, Budak 85, rođ. 31. 12. 1986. god., OIB: 33462867879, Ž", "2. Ivica Lenić, Hrvat, Budak, Budak 114 rođ. 21. 03. 1960. god., OIB: 82101813490, M", "3. Mirko Fajdić, Hrvat, Budak, Budak 123, rođ. 16. 07. 1962. god., OIB: 78646903688, M", "4. Marija Štefančić, Hrvatica, Budak, Budak 93/3, rođ. 12. 11. 1972 god., OIB: 59743699977, Ž", "5. Pavao Fajdić, Hrvat, Budak, Budak 119, rođ. 02. 03. 2004. god., OIB: 08391466153, M"] }
+    ]},
+    "BUŽIM": { klasa: "012-02/26-01/30", urbroj: "2125-1-01-26-4", liste: [
+        { naziv: "HRVATSKA DEMOKRATSKA ZAJEDNICA - HDZ", nositelj: "TATIJANA UZELAC", kandidati: ["1. Tatijana Uzelac, Hrvatica, Bužim, Bužim 75/2, rođ. 01. 09. 1975. god., OIB: 13485391446, Ž", "2. Jurica Uzelac, Hrvat, Bužim, Bužim 82, rođ. 27. 05. 1966. god., OIB: 37782356582, M", "3. Mate Uzelac, Hrvat, Bužim, Bužim 75/2, rođ. 25. 12. 1970. god., OIB: 94742846486, M", "4. Tomislava Prpić, Hrvatica, Bužim, Bužim 39, rođ. 05. 06. 2005. god., OIB: 35745764622, Ž", "5. Josipa Uzelac, Hrvatica, Bužim, Bužim 89, rođ. 07. 04. 1978. god., OIB: 37116360447, Ž"] },
+        { naziv: "LiPO", nositelj: "LUKA DOŠEN", kandidati: ["1. Luka Došen, Hrvat, Bužim, Bužim 12B, rođ. 31. 10. 1995. god., OIB: 17579206378, M", "2. Milan Pavičić, Hrvat, Bužim, Bužim 46, rođ. 29. 07. 1998 god., OIB: 04085268853, M", "3. Kristijan Devčić, Hrvat, Bužim, Bužim 91, rođ. 21. 01. 2004. god., OIB: 00011104149, M", "4. Manda Došen, Hrvatica, Bužim, Bužim 14, rođ. 22. 04. 1978. god., OIB: 52308706949, Ž", "5. Jasna Colnar, Hrvatica, Bužim, Bužim 112/1, rođ. 05. 01. 1967. god., OIB: 17981198770, Ž"] }
+    ]},
+    "DEBELO BRDO": { klasa: "012-02/26-01/31", urbroj: "2125-1-01-26-3", liste: [
+        { naziv: "HRVATSKA DEMOKRATSKA ZAJEDNICA - HDZ", nositelj: "ANTONIO RUDELIĆ", kandidati: ["1. Antonio Rudelić, Hrvat, Debelo Brdo I, Debelo Brdo I 1, rođ. 16. 06. 1999. god., OIB: 43025031556, M", "2. Ivica Rudelić, Hrvat, Debelo Brdo I, Debelo Brdo I 1/3, rođ. 23. 04. 1964. god., OIB: 35284481348, M", "3. Martina Dasović Pavelić, Hrvatica, Debelo Brdo, Debelo Brdo 7/1, rođ. 03. 01. 1980. god., OIB: 67485683491, Ž", "4. Tomislav Rudelić, Hrvat, Debelo Brdo I, Debelo Brdo I 1/5, rođ. 01. 06. 1982. god., OIB: 76487684777, M", "5. Joso Maras, Hrvat, Debelo Brdo I, Debelo Brdo I 9, rođ. 04. 11. 1954. god., OIB: 34901911026, M"] }
+    ]},
+
+    // --- BIVŠA GRUPA 2 ---
+    "DONJE PAZARIŠTE": { klasa: "012-02/26-01/32", urbroj: "2125-1-01-26-4", liste: [
+        { naziv: "HRVATSKA DEMOKRATSKA ZAJEDNICA - HDZ", nositelj: "SLAVKO JURČIĆ", kandidati: ["1. Slavko Jurčić, Hrvat, Popovača Pazariška, Popovača Pazariška 48, rođ. 06. 01. 1968. god., OIB: 88427087595, M", "2. Magdalena Dundović, Hrvatica, Popovača Pazariška, Popovača 63, rođ. 08. 12. 1978. god. OIB: 84244816888, Ž", "3. Nikola Jurčić, Hrvat, Popovača Pazariška, Popovača Pazariška 61, rođ. 07. 12. 1972. god., OIB: 67592070082, M", "4. Mile Dragičević, Hrvat, Mala Plana, Mala Plana 36, rođ. 12. 10. 1973. god., OIB: 21918678379, M", "5. Katarina Krpan, Hrvatica, Mala Plana, Mala Plana 3A, rođ. 03. 12. 1997. god., OIB: 37320583072, Ž"] },
+        { naziv: "LiPO", nositelj: "TOMISLAVA MILINKOVIĆ", kandidati: ["1. Tomislava Milinković, Hrvatica, Donje Pazarište, Lug 32, rođ. 24. 08. 1985. god., OIB: 22710908991, Ž", "2. Milan Rukavina, Hrvat, Donje Pazarište, Donje Pazarište 51, rođ. 06 01. 1984. god. OIB: 75850018764, M", "3. Tomislav Jurčić, Hrvat, Donje Pazarište, Donje Pazarište 69, rođ. 11. 05. 1973. god., OIB: 06885165976, M", "4. Božo Biškupović, Hrvat, Donje Pazarište, Donje Pazarište 71A , rođ. 12. 07. 1964. god., OIB: 68694870730, M", "5. Ivana Rukavina, Hrvatica, Podastrana, Podastrana 36, rođ. 31. 05. 1995. god., OIB: 95576094524, Ž"] }
+    ]},
+    "GOSPIĆ": { klasa: "012-02/26-01/21", urbroj: "2125-1-01-26-5", liste: [
+        { naziv: "HRVATSKA DEMOKRATSKA ZAJEDNICA - HDZ", nositelj: "IVAN RADOŠEVIĆ", kandidati: ["1. Ivan Radošević, Hrvat, Gospić, Pazariška ulica 59, rođ. 22. 07. 1971. god., OIB: 00565659801, M", "2. Barbara Tomljenović Jurković, Hrvatica, Gospić, Silvija Strahimira Kranjčevića 3, rođ. 07. 08. 1987. god., OIB: 14803286001, Ž", "3. Božo Marković, Hrvat, Gospić, Ulica 118. brigade Hrvatske vojske 3B, rođ. 21. 06. 1983. god., OIB: 82061745141, M", "4. Valentina Kulaš, Hrvatica, Gospić, Lovinačka ulica 13, rođ. 11. 12. 1979. god., OIB: 08138082071, Ž", "5. Mile Milković, Hrvat, Gospić, Smiljanska ulica 61, rođ. 11. 03. 1986. god., OIB: 79984913648, M"] },
+        { naziv: "HRVATSKA STRANKA PRAVA - HSP", nositelj: "MARIA ŽUPAN", kandidati: ["1. Maria Župan, Hrvatica, Gospić, Pazariška ulica 50, rođ. 11. 07. 1993. god., OIB: 21077008737, Ž", "2. Ivica Sokolić, Hrvat, Gospić, Budačka ulica 200, rođ. 11. 08. 1996. god., OIB: 25992574599, M", "3. Ivica Pavičić, Hrvat, Gospić, Budačka ulica 210/E, rođ. 12. 06. 1977. god., OIB: 31856793736, M", "4. Ankica Ratković, Hrvatica, Gospić, Kaniška ulica 26, rođ. 01. 05. 1970. god., OIB: 66425603949, Ž", "5. Vladimir Jurčić, Hrvat, Gospić, Budačka ulica 261, rođ. 25. 12. 1951. god, OIB: 56737340822, M"] },
+        { naziv: "LiPO", nositelj: "mr. DARKO MILINOVIĆ, dr.med.", kandidati: ["1. mr. Darko Milinović, dr. med., Hrvat, Gospić, Kaniška ulica 118, rođ. 25. 04. 1963. god., OIB: 28516863700, M", "2. Ruža Uremović, mag. med.,tech. Hrvatica, Gospić, Ulica Kneza Lovre Milinkovića 5, rođ. 28. 12. 1965. god., OIB: 78991042774, Ž", "3. Antonijo Šebalj, Hrvat, Gospić, Kaniška ulica 29, rođ. 12. 09. 1973. god., OIB: 46233574914, M", "4. Marija Baburić Vranešić, univ.spec.oec. Hrvatica, Gospić, Kaniška ulica 24, rođ. 03. 12. 1983. god., OIB: 99589788526, Ž", "5. Darko Božić, Hrvat, Gospić, Budačka ulica 237, rođ. 11. 07. 1986. god., OIB: 31115450546, M"] }
+    ]},
+    "KALINOVAČA": { klasa: "012-02/26-01/33", urbroj: "2125-1-01-26-3", liste: [
+        { naziv: "HRVATSKA DEMOKRATSKA ZAJEDNICA - HDZ", nositelj: "SLAVKO STARČEVIĆ", kandidati: ["1. Slavko Starčević, Hrvat, Kalinovača, Kalinovača 87B, rođ. 02. 01. 1972. god., OIB: 96637417928, M", "2. Nikola Kolačević, Hrvat, Kalinovača, Kalinovača 46, rođ. 27. 04. 1987. god., OIB: 58484178857, M", "3. Pero Kalanj, Hrvat, Kalinovača, Kalinovača 112, rođ. 14. 01. 1969. god., OIB: 36524206708, M", "4. Ivan Pavletić, Hrvat, Kalinovača, Kalinovača 22A, rođ. 07. 02. 1999. god., OIB: 41938788132, M", "5. Luka Šimić, Hrvat, Kalinovača, Kalinovača 20, rođ. 02. 10. 1959. god., OIB: 94506137599, M"] }
+    ]},
+    "KANIŽA": { klasa: "012-02/26-01/34", urbroj: "2125-1-01-26-4", liste: [
+        { naziv: "HRVATSKA DEMOKRATSKA ZAJEDNICA - HDZ", nositelj: "ANDRIJA BRKLJAČIĆ", kandidati: ["1. Andrija Brkljačić, Hrvat, Kaniža Gospićka, Donja Kaniža 25, rođ. 29. 12. 1975. god., OIB: 86844334472, M", "2. Marko Brkljačić, Hrvat, Kaniža Gospićka, Donja Kaniža 50, rođ. 02. 07. 1985. god., OIB: 41571881696, M", "3. Domagoj Jurković, Hrvat, Kaniža Gospićka, ulica. Ivana Hrvaćanina 1A, rođ. 02. 01. 2004. god., OIB: 95507127667, M", "4. Antonela Jengić, Hrvatica, Kaniža Gospićka, Donja Kaniža 24, rođ. 16. 06. 1997. god., OIB: 18866034516, Ž", "5. Ana Biljan, Hrvatica, Kaniža Gospićka, Donja Kaniža 67, rođ. 30. 04. 1986. god., OIB: 41409002323, Ž"] },
+        { naziv: "LiPO", nositelj: "ŽELJKO STILINOVIĆ", kandidati: ["1. Željko Stilinović, Hrvat, Kaniža Gospićka, Kaniža 44A, rođ. 27. 04. 1964. god., OIB: 58046103689, M", "2. Ivica Matijević, Hrvat, Kaniža Gospićka, Put hrvatske garde 1, rođ. 03. 08. 1964. god., OIB: 94409464577, M", "3. Nikica Stilinović, Hrvat, Kaniža Gospićka, Kaniža 64, rođ. 08. 02. 1969. god., OIB: 44149827625, M", "4. Damir Mataija, Hrvat, Kaniža Gospićka, Kaniža 31B, rođ. 04. 07. 1985. god., OIB: 93772408671, M", "5. Damir Maras, Hrvat, Kaniža Gospićka, Kaniža 62, rođ. 05. 07. 1988. god., OIB: 76118874472, M"] }
+    ]},
+    "KLANAC": { klasa: "012-02/26-01/35", urbroj: "2125-1-01-26-3", liste: [
+        { naziv: "HRVATSKA DEMOKRATSKA ZAJEDNICA - HDZ", nositelj: "PETAR RADOŠEVIĆ", kandidati: ["1. Petar Radošević, Hrvat, Klanac, Klanac 93, rođ. 01. 07. 1977. god., OIB: 69158688362, M", "2. Nikica Milinković, Hrvat, Vranovine, Vranovine 9D, rođ. 19. 11. 1965. god., OIB: 31675404556, M", "3. Stipe Balenović, Hrvat, Oteš, Oteš 94, rođ. 05. 11. 1966. god., OIB: 58846837723, M", "4. Josip Krpan, Hrvat, Klanac, Klanac 135, rođ. 29. 04. 1975. god., OIB: 58600551210, M", "5. Željko Duić, Hrvat, Oteš, Oteš 84, rođ. 22. 02. 1965. god., OIB: 70245418273, M"] }
+    ]},
+    "LIČKI ČITLUK": { klasa: "012-02/26-01/36", urbroj: "2125-1-01-26-6", liste: [
+        { naziv: "LiPO", nositelj: "MICA MAŽURAN", kandidati: ["1. Mica Mažuran, Srpkinja, Ornice, Ornice 19, rođ. 15. 01. 1965. god., OIB: 74862059923, Ž", "2. Milan Potkonjak, Srbin, Ornice, Ornice 6, rođ. 31. 03. 1952. god., OIB: 04663533991, M", "3. Vesna Krajnović, Hrvatica, Lički Čitluk, Lički Čitluk 17, rođ. 29. 05. 1968. god., OIB: 02094535616, Ž", "4. Snježana Zekić, Hrvatica, Lički Čitluk, Lički Čitluk 63, rođ. 28. 01. 1966. god., OIB: 12520875739, Ž", "5. Ljubomir Krajnović, Srbin, Lički Čitluk, Lički Čitluk 17, rođ. 04. 07. 1962. god., OIB: 58634574660, M"] }
+    ]},
+    "LIČKI NOVI": { klasa: "012-02/26-01/37", urbroj: "2125-1-01-26-4", liste: [
+        { naziv: "HRVATSKA DEMOKRATSKA ZAJEDNICA - HDZ", nositelj: "JOSIP DOŠEN", kandidati: ["1. Josip Došen, Hrvat, Lički Novi, Lički Novi 29A, rođ. 16. 08. 1991. god., OIB: 79290479419, M", "2. Josip Serdar, Hrvat, Lički Novi, Lički Novi 132B, rođ. 08. 06. 1975. god., OIB: 92361645098, M", "3. Blaženko Asić, Hrvat, Lički Novi, Lički Novi 170/2, rođ. 24. 01. 1996. god., OIB: 01288369715, M", "4. Nikola Došen, Hrvat, Lički Novi, Lički Novi 29B, rođ. 28. 05. 1958. god., OIB: 75150047879, M", "5. Božidar Brkljačić, Hrvat, Lički Novi, Lički Novi 13A, rođ. 28. 10. 1960. god., OIB: 04101998892, M"] },
+        { naziv: "LiPO", nositelj: "NIKOLINA TONKOVIĆ ČORAK", kandidati: ["1. Nikolina Tonković Čorak, Hrvatica, Lički Novi, Lički Novi 192A, rođ. 27. 06. 1980. god., OIB: 18632461392, Ž", "2. Tomislav Bićan, Hrvat, Lički Novi, Lički Novi 114, rođ. 03. 08. 1985. god., OIB: 44800268391, M", "3. Ivana Lisac, Hrvatica, Lički Novi, Lički Novi 108A, rođ. 22. 01. 1992. god., OIB: 65767388054, Ž", "4. Juko Šaban, Hrvat, Lički Novi, Lički Novi 115/3, rođ. 07. 05. 1975. god., OIB: 50461570767, M", "5. Josip Francetić, Hrvat, Lički Novi, Lički Novi 63, rođ. 28. 11. 1988. god., OIB: 04802033733, M"] }
+    ]},
+    "LIČKI OSIK": { klasa: "012-02/26-01/22", urbroj: "2125-1-01-26-5", liste: [
+        { naziv: "HRVATSKA DEMOKRATSKA ZAJEDNICA - HDZ", nositelj: "IVAN ĆULUMOVIĆ", kandidati: ["1. Ivan Ćulumović, Hrvat, Lički Osik, Ulica popa Frana Biničkog 16, rođ. 15. 07. 1955. god., OIB: 57494028313, M", "2. Marta Grgurić, Hrvatica, Lički Osik, Ulica sv. Josipa 7, rođ. 21. 10. 1974. god., OIB: 98768717422, Ž", "3. Josip Jurković, Hrvat, Lički Osik, Vukšić 5/2, rođ. 06. 08. 2001. god., OIB: 05111806415, M", "4. Petar Đapić, Hrvat, Lički Osik, Ulica sv. Josipa 7, rođ. 01. 05. 1977. god., OIB: 16195882780, M", "5. Grga Hećimović, Hrvat, Lički Osik, Ulica popa Frana Biničkog 14, rođ. 27. 03. 1964. god., OIB: 47968436675, M"] },
+        { naziv: "HRVATSKA STRANKA PRAVA - HSP", nositelj: "TOMISLAV RATKOVIĆ", kandidati: ["1. Tomislav Ratković, Hrvat, Lički Osik, Kosinjska ulica 1, rođ. 11. 09. 2000. god., OIB: 45836549326, M", "2. Luka Čačić, Hrvat, Lički Osik, Ulica popa Frana. Biničkog 13B, rođ. 10. 07. 2005. god., OIB: 34790407966, M", "3. Mario Tomac, Hrvat, Lički Osik, Vukšić 1/1, rođ. 30. 09. 1993. god., OIB: 78290589570, M", "4. Marko Pavičić, Hrvat, Lički Osik, Urije 151, rođ. 31. 05. 1979. god., OIB: 89830309458, M", "5. Alen Marojević, Hrvat, Lički Osik, Ulica sv. Josipa 10, rođ. 10. 05. 2005. god., OIB: 78785499225, M"] },
+        { naziv: "LiPO", nositelj: "JOSO HEĆIMOVIĆ", kandidati: ["1. Joso Hećimović, Hrvat, Lički Osik, Kulska cesta 65, rođ. 09. 02. 1956. god., OIB: 97173694186, M", "2. Ante Šarić, Hrvat, Lički Osik, Hrv. časnika Ivana Čanića Baje 3, rođ. 02. 06. 1995. god., OIB: 55137423603, M", "3. Martina Jerković, Hrvatica, Lički Osik, Ulica Riječka 3, rođ. 14. 04. 1993. god., OIB: 02679680454, Ž", "4. Stipe Lulić, Hrvat, Lički Osik, Ulica popa Frana. Biničkog 16 , rođ. 06. 01. 1965. god., OIB: 24151693720, M", "5. Nikolina Jelić, Hrvatica, Lički Osik, Ulica sv. Josipa 5, rođ. 27. 02. 1977. god., OIB: 13443804078, Ž"] }
+    ]},
+
+    // --- BIVŠA GRUPA 3 ---
+    "LIČKI RIBNIK": { klasa: "012-02/26-01/38", urbroj: "2125-1-01-26-4", liste: [
+        { naziv: "HRVATSKA DEMOKRATSKA ZAJEDNICA - HDZ", nositelj: "MILAN SEKULIĆ", kandidati: ["1. Milan Sekulić, Hrvat, Lički Ribnik, Lički Ribnik 13, rođ. 09. 11. 1965. god., OIB: 47825157570, M", "2. Petar Dukovac, Hrvat, Lički Ribnik, Lički Ribnik 17, rođ. 28. 06. 1950. god., OIB: 71717044472, M", "3. Nikola Matić, Hrvat, Lički Ribnik, Lički Ribnik 102, rođ. 19. 07. 1989. god., OIB: 88887239897, M", "4. Ivan Grgurić, Hrvat, Lički Ribnik, Lički Ribnik 127, rođ. 09. 05. 1955. god., OIB: 25671857387, M", "5. Josip Mudrovčić, Hrvat, Lički Ribnik, Lički Ribnik 20, rođ. 17. 03. 1966. god., OIB: 79364020765, M"] },
+        { naziv: "LiPO", nositelj: "VLADE GRGURIĆ", kandidati: ["1. Vlade Grgurić, Hrvat, Lički Ribnik, Lički Ribnik 111, rođ. 26. 04. 1979. god., OIB: 66890821372, M", "2. Mario Pražen, Hrvat, Lički Ribnik, Lički Ribnik 100A, rođ. 20. 07. 1976. god., OIB: 64361465404, M", "3. Željko Dukovac, Hrvat, Lički Ribnik, Lički Ribnik 91, rođ. 13. 09. 1968. god., OIB: 37181909529, M", "4. Ivan Dasović, Hrvat, Lički Ribnik, Lički Ribnik 122, rođ. 08. 08. 1989. god., OIB: 81902109851, M", "5. Iva Golac Krmpotić, Hrvatica, Lički Ribnik, Lički Ribnik 37, rođ. 18 06. 1987. god., OIB: 16818208726, Ž"] }
+    ]},
+    "MEDAK": { klasa: "012-02/26-01/45", urbroj: "2125-1-01-26-3", liste: [
+        { naziv: "LiPO", nositelj: "MIRJANA TRAVICA", kandidati: ["1. Mirjana Travica, Hrvatica, Medak, Medak 134, rođ. 07. 07. 1952. god., OIB: 38553883169, Ž", "2. Marija Levnaić, Srpkinja, Medak, Medak 202/1, rođ. 17. 10. 1957. god., OIB: 99175270822, Ž", "3. Milena Marković, Srpkinja, Brezik, Brezik 46, rođ. 10. 01. 1962. god., OIB: 76216730056, Ž", "4. Mileva Potrebić, Srpkinja, Počitelj, Počitelj 208, rođ. 12. 11. 1955. god., OIB: 76986100443, Ž", "5. Milan Kuprešanin, Srbin, Brezik, Brezik 43, rođ. 03. 01. 1953. god., OIB: 78439364938, M"] }
+    ]},
+    "MOGORIĆ": { klasa: "012-02/26-01/17", urbroj: "2125-1-01-26-5", liste: [
+        { naziv: "KANDIDACIJSKA LISTA GRUPE BIRAČA MJESNOG ODBORA MOGORIĆ", nositelj: "DUŠAN BORIĆ", kandidati: ["1. Dušan Borić, Srbin, Mogorić, Mogorić 149 A, rođ. 10. 08. 1953. god., OIB: 30803114036, M", "2. Anka Milojević, Srpkinja, Mogorić, Mogorić 77, rođ. 10. 11. 1953. god., OIB: 90401631442, Ž", "3. Mladen Milojević, Srbin, Mogorić, Mogorić 67, rođ. 30. 01. 1950. god., OIB: 61067258238, M", "4. Milan Borić, Srbin, Mogorić, Mogorić 148, rođ. 15. 03. 1957. god., OIB: 67812277482, M", "5. Mileva Polovina, Srpkinja, Mogorić, Mogorić 164, rođ. 20. 02. 1957. god., OIB: 88005097657, Ž"] },
+        { naziv: "KANDIDACIJSKA LISTA GRUPE BIRAČA MJESNOG ODBORA MOGORIĆ 2", nositelj: "BOGDAN IVANČEVIĆ", kandidati: ["1. Bogdan Ivančević, Srbin, Mogorić, Mogorić 94, rođ. 01. 01. 1954. god., OIB: 77365140991, M ", "2. Milan Džodan, Srbin, Mogorić, Mogorić 6, rođ. 09. 03. 1955. god., OIB: 20318369817, M", "3. Dragica Čuturilo, Srpkinja, Mogorić, Mogorić 42, rođ. 02. 04. 1964. god., OIB: 61698969944, Ž", "4. Anka Njegomir - Ivančević, Srpkinja, Mogorić, Mogorić 94, rođ. 06. 02. 1952. god., OIB: 43088184482, Ž", "5. Mile Čuturilo, Srbin, Mogorić, Mogorić 42, rođ. 27. 11. 1959. god., OIB: 71164199173, M"] }
+    ]},
+    "MUŠALUK": { klasa: "012-02/26-01/46", urbroj: "2125-1-01-26-3", liste: [
+        { naziv: "LiPO", nositelj: "MILE HOLJEVAC", kandidati: ["1. Mile Holjevac, Hrvat, Mušaluk, Mušaluk 41A, rođ. 28. 11. 1981. god., OIB: 64784022282, M", "2. Mirna Holjevac, Hrvatica, Mušaluk, Mušaluk 41A, rođ. 07 08. 1991. god., OIB: 52632688215, Ž", "3. Josip Horvatović, Hrvat, Mušaluk, Mušaluk 9, rođ. 14. 12. 1994. god., OIB: 84522913447, M", "4.  Nikica Šimatović, Hrvat, Mušaluk, Mušaluk 45, rođ. 13. 04. 1975. god., OIB: 27614250059, M", "5. Ivan Žarak, Hrvat, Mušaluk, Mušaluk 7, rođ. 23. 09. 1987. god., OIB: 05887874642, M"] }
+    ]},
+    "PODOŠTRA": { klasa: "012-02/26-01/39", urbroj: "2125-1-01-26-4", liste: [
+        { naziv: "HRVATSKA DEMOKRATSKA ZAJEDNICA - HDZ", nositelj: "NIKICA BUBAŠ", kandidati: ["1. Nikica Bubaš, Hrvat, Podoštra, Podoštra 30, rođ. 02. 12. 1972. god., OIB: 62515588563, M", "2. Marijan Butorac, Hrvat, Podoštra, Podoštra 3A, rođ. 09. 12. 1978. god., OIB: 94792719330, M", "3. Ive Stilinović, Hrvat, Podoštra, Podoštra 37/1, rođ. 01. 09. 1991. god., OIB: 46159228765, M", "4. Blaž Balenović, Hrvat, Podoštra, Podoštra 10, rođ. 01. 01. 1955. god., OIB: 78982047604, M", "5. Milan Mataija, Hrvat, Podoštra, Podoštra 75, rođ. 10. 01. 1968. god., OIB: 60462415469, M"] },
+        { naziv: "LiPO", nositelj: "JURE MATAIJA", kandidati: ["1. Jure Mataija, Hrvat, Podoštra, Podoštra 42, rođ. 23. 04. 1965. god., OIB: 29953702687, M", "2. Ankica Marincel, Hrvatica, Podoštra, Podoštra 14, rođ. 15. 09. 1979. god., OIB: 54828587748, Ž", "3. Ivica Rukavina, Hrvat, Podoštra, Podoštra 56, rođ. 04. 12. 1990. god., OIB: 75904169628, M", "4. Božo Mataija, Hrvat, Podoštra, Podoštra 68/3, rođ. 27. 05. 1996. god., OIB: 38892489283, M", "5. Ivica Rukavina, Hrvat, Podoštra, Podoštra 56, rođ. 01. 05. 1963. god., OIB: 22859906772, M"] }
+    ]},
+
+    // --- BIVŠA GRUPA 4 ---
+    "SMILJAN": { klasa: "012-02/26-01/23", urbroj: "2125-1-01-26-5", liste: [
+        { naziv: "HRVATSKA DEMOKRATSKA ZAJEDNICA - HDZ", nositelj: "IVAN JOVANOVIĆ", kandidati: ["1. Ivan Jovanović, Hrvat, Smiljan, Smiljan 86, rođ. 20. 08. 1962. god., OIB: 23829251450, M", "2. Katica Prpić, Hrvatica, Smiljan, Smiljan 4/2, rođ. 26. 04. 1966. god., OIB: 09740538526, Ž", "3. Ivan Pejnović, Hrvat, Smiljan, Smiljan 3/4, rođ. 20. 10. 1960. god. OIB: 10030804428, M", "4. Luka Krmpotić, Hrvat, Smiljan, Smiljan 62A, rođ. 26. 01. 1996. god., OIB: 93525008955, M", "5. Mario Zorić, Hrvat, Smiljan, Smiljan 15/18, rođ. 25. 08. 1989. god., OIB: 24463967223, M"] },
+        { naziv: "HRVATSKA STRANKA PRAVA - HSP", nositelj: "JOSIP BOROVAC", kandidati: ["1. Josip Borovac, Hrvat, Smiljan, Smiljan 19/7, rođ. 03. 10. 1957. god., OIB: 52369655717, M", "2. Mile Pezelj, Hrvat, Smiljansko polje, Smiljansko polje 54/2, rođ. 20. 05. 1963. god., OIB: 34892028023, M", "3. Danijel Uzelac, Hrvat, Smiljan, Smiljan 168/2, rođ. 06. 05. 1958. god. OIB: 37868810182, M", "4. Marica Rupčić, Hrvatica, Smiljansko polje, Smiljansko polje 54/3, rođ. 20. 09. 1956. god., OIB: 13675381123, Ž", "5. Željko Marinić, Hrvat, Smiljansko polje, Smiljansko polje 75, rođ. 26. 06. 1967. god., OIB: 69095952008, M"] },
+        { naziv: "LiPO", nositelj: "ŽELJKO DOŠEN", kandidati: ["1. Željko Došen, Hrvat, Smiljan, Smiljan 22, rođ. 09. 02. 1972. god., OIB: 35681554488, M", "2. Joža Miškulin, Hrvat, Smiljan, Smiljan 115, rođ. 17. 03.1965. god., OIB: 64666269480, M", "3. Ana Jelinić, Hrvatica, Smiljan, Smiljan 49, rođ. 30. 10. 1995. god. OIB: 81996587634, Ž", "4. Frane Šarić, Hrvat, Smiljan, Smiljan 22A, rođ. 05. 08. 1980. god., OIB: 96641984823, M", "5. Željko Jelinić, Hrvat, Smiljan, Smiljan 3/3, rođ. 22. 09. 1970. god., OIB: 71220901364, M"] }
+    ]},
+    "ŠIROKA KULA": { klasa: "012-02/26-01/40", urbroj: "2125-1-01-26-4", liste: [
+        { naziv: "HRVATSKA DEMOKRATSKA ZAJEDNICA - HDZ", nositelj: "VESNA NIKŠIĆ", kandidati: ["1. Vesna Nikšić, Hrvatica, Široka Kula, Široka Kula 118, rođ. 01. 05. 1974. god. OIB: 15526232636, Ž", "2. Robert Nikšić, Hrvat, Široka Kula, Široka Kula 120, rođ. 12. 10. 1972. god. OIB: 11742381630, M", "3. Dragan Nikšić, Hrvat, Široka Kula, Široka Kula 182, rođ. 08. 07. 1970. god. OIB: 89597173105, M", "4. Milan Orešković, Hrvat, Široka Kula, Široka Kula 4, rođ. 27. 02. 1983. god. OIB: 35723737578, M", "5. Marko Orešković, Hrvat, Široka Kula, Široka Kula 36, rođ. 18. 05.1998. god. OIB: 61871425536, M"] },
+        { naziv: "LiPO", nositelj: "MANDICA RUKAVINA", kandidati: ["1. Mandica Rukavina, Hrvatica, Široka Kula, Široka Kula 156, rođ. 28. 03. 1973. god. OIB: 81478001683, Ž", "2. Ivan Vojvodić, Hrvat, Široka Kula, Široka Kula 57, rođ. 02. 05. 1996. god. OIB: 02500636920, M", "3. Željko Popović, Hrvat, Široka Kula, Široka Kula 81/1, rođ. 05. 04. 1971. god. OIB: 50163760743, M", "4. Milan Orešković, Hrvat, Široka Kula, Široka Kula 27, rođ. 24. 05. 1953. god. OIB: 06018249333, M", "5. Joso Orešković, Hrvat, Široka Kula, Široka Kula 4, rođ. 25. 05. 1947. god. OIB: 93843555970, M"] }
+    ]},
+    "TRNOVAC": { klasa: "012-02/26-01/41", urbroj: "2125-1-01-26-4", liste: [
+        { naziv: "HRVATSKA DEMOKRATSKA ZAJEDNICA - HDZ", nositelj: "KATARINA MARKOVIĆ", kandidati: ["1. Katarina Marković, Hrvatica, Trnovac, Trnovac 52, rođ. 02. 09. 1997. god. OIB: 89328565264, Ž", "2. Martin Marković, Hrvat, Trnovac, Trnovac 52, rođ. 29. 09. 1959. god. OIB: 38392838138, M", "3. Mate Vujnović, Hrvat, Novoselo Trnovačko, Novoselo Trnovačko 6, rođ. 26. 01. 1956. god. OIB: 15119916070, M", "4. Mile Marković, Hrvat, Trnovac, Trnovac 83, rođ. 02. 02. 1988. god. OIB: 84350969946, M", "5. Jure Vujnović, Hrvat, Trnovac, Trnovac 17, rođ. 24. 11. 1962. god. OIB: 77126898561, M"] },
+        { naziv: "LiPO", nositelj: "MARIJAN BRKLJAČIĆ", kandidati: ["1. Marijan Brkljačić, Hrvat, Trnovac, Trnovac 82, rođ. 21. 07. 1996. god. OIB: 54440675240, M", "2. Štefan Čačić, Hrvat, Novoselo Trnovačko, Novoselo Trnovačko 14, rođ. 29. 12. 1977. god. OIB: 54590602378, M", "3. Ivica Brkljačić, Hrvat, Novoselo Trnovačko, Novoselo Trnovačko 1/11, rođ. 31. 05. 1991. god. OIB: 88298154888, M", "4. Nikola Brkljačić, Hrvat, Trnovac, Trnovac 82, rođ. 09. 06. 1992. god. OIB: 02906172050, M", "5. Bruno Ćaćić, Hrvat, Trnovac, Trnovac 94, rođ. 18. 12. 1996.. god. OIB: 68944566362, M"] }
+    ]},
+    "VELIKI ŽITNIK": { klasa: "012-02/26-01/42", urbroj: "2125-1-01-26-4", liste: [
+        { naziv: "HRVATSKA DEMOKRATSKA ZAJEDNICA - HDZ", nositelj: "JOSIPA MARKOVIĆ", kandidati: ["1. Josipa Marković, Hrvatica, Veliki Žitnik, Veliki Žitnik 6, rođ. 20. 03. 2000. god. OIB: 69067365812, Ž", "2. Nikola Starčević, Hrvat, Veliki Žitnik, Veliki Žitnik 27, rođ. 19. 01. 1965. god. OIB: 16280277688, M", "3. Ivica Balenović, Hrvat, Veliki Žitnik, Veliki Žitnik 3A, rođ. 01. 01. 1964. god. OIB: 12507147392, M", "4. Jelka Balenović, Hrvatica, Veliki Žitnik, Veliki Žitnik 3A, rođ. 10. 11. 1965. god. OIB: 25142797362, Ž", "5. Danica Marković, Hrvatica, Veliki Žitnik, Veliki Žitnik 6, rođ. 09. 11. 1969. god. OIB: 82265418170, Ž"] },
+        { naziv: "LiPO", nositelj: "ANTE STARČEVIĆ", kandidati: ["1. Ante Starčević, Hrvatica, Veliki Žitnik, Veliki Žitnik 23, rođ. 06. 04. 1996. god. OIB: 18159791419, M", "2. Tomislava Javor Starčević, Hrvatica, Veliki Žitnik, Veliki Žitnik 23, rođ. 13. 04. 1999. god. OIB: 88041651258, Ž", "3. Ivica Balenović, Hrvat, Veliki Žitnik, Veliki Žitnik 12, rođ. 07. 11. 1959 god. OIB: 83503894109, M", "4. Verka Starčević, Hrvatica, Veliki Žitnik, Veliki Žitnik 15A, rođ. 05. 06. 1951. god. OIB: 90312434643, Ž", "5. Katica Starčević, Hrvatica, Veliki Žitnik, Veliki Žitnik 23, rođ. 09. 05. 1967. god. OIB: 73388962789, Ž"] }
+    ]},
+    "VREBAC": { klasa: "012-02/26-01/16", urbroj: "2125-1-01-26-4", liste: [
+        { naziv: "KANDIDACIJSKA LISTA GRUPE BIRAČA MJESNOG ODBORA VREBAC", nositelj: "MILAN DRAGOSAVAC", kandidati: ["1. Milan Dragosavac, Srbin, Vrebac, Vrebac 24, rođ. 03. 08. 1959. god., OIB: 21590870341, M", "2. Milorad Krajnović, Srbin, Vrebac, Vrebac 51, rođ. 25. 10. 1955. god., OIB: 58149429286, M", "3. Marija Barać, Srpkinja, Vrebac, Vrebac 124 A, rođ. 22. 02. 1952. god. OIB: 55624145214, Ž", "4. Jovo Cetina, Srbin, Vrebac, Vrebac 79, rođ. 07. 01. 1957. god., OIB: 34299711023, M", "5. Dušanka Krajnović, Srpkinja, Vrebac, Vrebac 51, rođ. 21. 05. 1958. god., OIB: 00477108298, Ž"] },
+        { naziv: "KANDIDACIJSKA LISTA GRUPE BIRAČA MJESNOG ODBORA VREBAC 2", nositelj: "MILOŠ POPOVIĆ", kandidati: ["1. Miloš Popović, Srbin, Vrebac, Vrebac 4, rođ., 18. 06. 1962.. god., OIB: 62528180307, M", "2. Kata Dragosavac, Srpkinja, Vrebac, Vrebac 145, rođ. 05. 09. 1965. god., OIB: 99885192743, Ž", "3. Dušan Njegomir, Srbin, Zavođe, Zavođe 8, rođ. 06. 10. 1959. god., OIB: 41131411687, M", "4. Duško Novković, Srbin, Pavlovac Vrebački, Pavlovac Vrebački 36, rođ. 09. 02. 1965.. god., OIB: 76858847058, M", "5. Sandra Novković, Srpkinja, Pavlovac Vrebački, Pavlovac Vrebački 11, rođ. 14. 02. 1999. god., OIB: 72550071579, Ž"] }
+    ]},
+    "ŽABICA": { klasa: "012-02/26-01/43", urbroj: "2125-1-01-26-4", liste: [
+        { naziv: "HRVATSKA DEMOKRATSKA ZAJEDNICA - HDZ", nositelj: "JOSIP ZDUNIĆ", kandidati: ["1. Josip Zdunić, Hrvat, Žabica, Žabica 51, rođ. 21. 05. 1969. god. OIB: 91533120257, M", "2. Krešimir Ban, Hrvat, Žabica, Žabica 63, rođ. 22. 05. 1958. god. OIB: 34363245326, M", "3. Milan Ban, Hrvat, Žabica, Žabica 4, rođ. 02. 02. 1985. god. OIB: 34775939778, M", "4. Ivan Škulj, Hrvat, Žabica, Žabica 29, rođ. 06. 11. 1976. god. OIB: 73212724622, M", "5. Ivan Zdunić, Hrvat, Žabica, Žabica 51, rođ. 30. 04. 1996. god. OIB: 99763217448, M"] },
+        { naziv: "LiPO", nositelj: "ANTON BUNETA", kandidati: ["1. Anton Buneta, Hrvat, Žabica, Žabica 23, rođ. 17. 09. 1964. god. OIB: 36542662362, M", "2. Igor Blažević, Hrvat, Žabica, Žabica 19, rođ. 19. 03. 1966. god. OIB: 74761136172, M", "3. Marica Mataija, Hrvatica, Žabica, Žabica 79, rođ. 21. 01. 1965. god. OIB: 37785387260, Ž", "4. Vlatko Mataija, Hrvat, Žabica, Žabica 79, rođ. 22. 06. 1960. god. OIB: 52409273829, M", "5. Ivica Tonković, Hrvat, Žabica, Žabica 43, rođ. 03. 05. 1967. god. OIB: 99068092974, M"] }
+    ]}
+};
+
+window.onload = function() {
+    const select = document.getElementById('odabirMO');
+    Object.keys(podaciIzbora).sort().forEach(mo => {
+        let opt = document.createElement('option');
+        opt.value = mo;
+        opt.innerText = "Mjesni odbor " + mo;
+        select.appendChild(opt);
+    });
+};
+
+function ucitajListeMO() {
+    const moKljuc = document.getElementById('odabirMO').value;
+    const container = document.getElementById('listeContainer');
+    const glavnaSekcija = document.getElementById('glavnaSekcija');
+    document.getElementById('rezultatiSekcija').style.display = 'none';
+    
+    container.innerHTML = "";
+    if (!moKljuc) {
+        glavnaSekcija.style.display = 'none';
+        return;
+    }
+    
+    const moPodaci = podaciIzbora[moKljuc];
+    document.getElementById('inputKlasa').value = moPodaci.klasa;
+    document.getElementById('inputUrbroj').value = moPodaci.urbroj;
+    
+    if (moKljuc === "GOSPIĆ" || moKljuc === "LIČKI OSIK") {
+        document.getElementById('brojMandata').value = 5;
+    } else {
+        document.getElementById('brojMandata').value = 5;
+    }
+    
+    moPodaci.liste.forEach((lista, indeks) => {
+        const card = document.createElement('div');
+        card.className = 'lista-card';
+        card.innerHTML = `
+            <div style="display: flex; gap: 15px; align-items: center;">
+                <div style="flex: 3;">
+                    <strong>${indeks + 1}. ${lista.naziv}</strong><br>
+                    <span style="font-size:13px; color:#4a5568; font-style:italic;">Nositelj: ${lista.nositelj}</span>
+                </div>
+                <div style="flex: 1;">
+                    <input type="number" class="input-glas-liste" data-naziv="${lista.naziv}" data-nositelj="${lista.nositelj}" min="0" value="0" style="width: 100%;">
+                </div>
+            </div>
+        `;
+        container.appendChild(card);
+    });
+    
+    glavnaSekcija.style.display = 'block';
+}
+
+let zadnjeSortiraneListe = [];
+let zadnjiZajednickiDjelitelj = 0;
+
+function obradiIzborneRezultate() {
+    const moKljuc = document.getElementById('odabirMO').value;
+    const ukupnoMandata = parseInt(document.getElementById('brojMandata').value);
+    const pragPostotak = parseFloat(document.getElementById('izborniPrag').value);
+    const nevazeciListici = parseInt(document.getElementById('statNevažeći').value) || 0;
+    const inputiLista = document.querySelectorAll('.input-glas-liste');
+    
+    let liste = [];
+    let ukupnoVazecihGlasova = 0;
+    const originalneListe = podaciIzbora[moKljuc].liste;
+    
+    inputiLista.forEach((input, i) => {
+        let glasovi = parseInt(input.value) || 0;
+        let naziv = input.getAttribute('data-naziv');
+        let nositelj = input.getAttribute('data-nositelj');
+        let kandPopis = originalneListe[i] ? originalneListe[i].kandidati : [];
+        
+        liste.push({ id: i, naziv: naziv, nositelj: nositelj, glasovi: glasovi, mandati: 0, postotak: 0, presaoPrag: false, zadnjiKolicnik: 0, kandidati: kandPopis });
+        ukupnoVazecihGlasova += glasovi;
+    });
+
+    liste.forEach(l => {
+        l.postotak = ukupnoVazecihGlasova > 0 ? (l.glasovi / ukupnoVazecihGlasova) * 100 : 0;
+        l.presaoPrag = l.postotak >= pragPostotak;
+    });
+
+    let sviKolicnici = [];
+    liste.forEach(l => {
+        if (l.presaoPrag && l.glasovi > 0) {
+            for (let m = 1; m <= ukupnoMandata; m++) {
+                sviKolicnici.push({ listaId: l.id, kolicnik: l.glasovi / m });
+            }
+        }
+    });
+
+    sviKolicnici.sort((a, b) => b.kolicnik - a.kolicnik);
+    let dodijeljeniMandatiBroj = Math.min(ukupnoMandata, sviKolicnici.length);
+    zadnjiZajednickiDjelitelj = 0;
+    
+    if (dodijeljeniMandatiBroj > 0) {
+        zadnjiZajednickiDjelitelj = sviKolicnici[dodijeljeniMandatiBroj - 1].kolicnik;
+    }
+
+    for (let i = 0; i < dodijeljeniMandatiBroj; i++) {
+        let dobitnik = liste.find(l => l.id === sviKolicnici[i].listaId);
+        if (dobitnik) {
+            dobitnik.mandati++;
+            dobitnik.zadnjiKolicnik = dobitnik.glasovi / dobitnik.mandati;
+        }
+    }
+
+    const tbody = document.querySelector('#tablicaRezultata tbody');
+    tbody.innerHTML = "";
+    zadnjeSortiraneListe = [...liste].sort((a, b) => b.glasovi - a.glasovi);
+    
+    zadnjeSortiraneListe.forEach(l => {
+        let tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td><strong>${l.naziv}</strong></td>
+            <td>${l.glasovi}</td>
+            <td>${l.postotak.toFixed(2)}%</td>
+            <td>${l.presaoPrag ? 'DA' : 'NE'}</td>
+            <td><span class="mandat-badge">${l.mandati}</span></td>
+        `;
+        tbody.appendChild(tr);
+    });
+    
+    document.getElementById('rezultatiSekcija').style.display = 'block';
+    osvjeziPodatkeZapisnika();
+}
+
+function osvjeziPodatkeZapisnika() {
+    const moKljuc = document.getElementById('odabirMO').value;
+    const preuzeto = document.getElementById('statPreuzeto').value || "0";
+    const neupotrebljeno = document.getElementById('statNeupotrebljeno').value || "0";
+    const upisano = document.getElementById('statUpisano').value || "0";
+    const glasovaloPopis = document.getElementById('statGlasovalo').value || "0";
+    const glasovaloPotvrde = document.getElementById('statPotvrde').value || "0";
+    const nevazeciListici = parseInt(document.getElementById('statNevažeći').value) || 0;
+
+    let ukupnoVazecih = 0;
+    zadnjeSortiraneListe.forEach(l => { ukupnoVazecih += l.glasovi; });
+    let ukupnoKutija = ukupnoVazecih + nevazeciListici;
+
+    document.getElementById('p_klasa').innerText = document.getElementById('inputKlasa').value || "-";
+    document.getElementById('p_urbroj').innerText = document.getElementById('inputUrbroj').value || "-";
+    document.getElementById('p_datum').innerText = document.getElementById('inputDatum').value || "-";
+    document.getElementById('p_datum_potpis').innerText = document.getElementById('inputDatum').value || "-";
+    document.getElementById('p_naslovMO').innerText = "MJESNOG ODBORA " + moKljuc;
+
+    document.getElementById('p_preuzeto').innerText = preuzeto;
+    document.getElementById('p_neupotrijebljeno').innerText = neupotrebljeno;
+    document.getElementById('p_upisano').innerText = upisano;
+    document.getElementById('p_glasovalo').innerText = glasovaloPopis;
+    document.getElementById('p_potvrde').innerText = glasovaloPotvrde;
+    document.getElementById('p_ukupnoGlasovalo').innerText = ukupnoKutija;
+    document.getElementById('p_vazeci').innerText = ukupnoVazecih;
+    document.getElementById('p_nevazeci').innerText = nevazeciListici;
+    document.getElementById('p_zajednickiDjelitelj').innerText = zadnjiZajednickiDjelitelj > 0 ? zadnjiZajednickiDjelitelj.toFixed(5) : "0.00000";
+
+    const pTablicaGlasovi = document.getElementById('p_tablica_glasovi_body');
+    pTablicaGlasovi.innerHTML = "";
+    zadnjeSortiraneListe.forEach(l => {
+        let tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td><strong>${l.naziv}</strong><br>Nositelj kandidacijske liste: ${l.nositelj}</td>
+            <td style="text-align: right; font-weight: bold;">${l.glasovi}</td>
+            <td style="text-align: right;">${l.postotak.toFixed(2)}%</td>
+            <td style="text-align: center;">${l.presaoPrag ? 'DA' : 'NE'}</td>
+        `;
+        pTablicaGlasovi.appendChild(tr);
+    });
+
+    const pTablicaDioba = document.getElementById('p_tablica_dioba_body');
+    pTablicaDioba.innerHTML = "";
+    zadnjeSortiraneListe.forEach(l => {
+        if (l.presaoPrag) {
+            let tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td><strong>${l.naziv}</strong></td>
+                <td style="text-align: right;">${l.glasovi}</td>
+                <td style="text-align: right;">${l.zadnjiKolicnik > 0 ? l.zadnjiKolicnik.toFixed(5) : '0.00000'}</td>
+                <td style="text-align: center; font-weight: bold; font-size: 15px;">${l.mandati}</td>
+            `;
+            pTablicaDioba.appendChild(tr);
+        }
+    });
+
+    const sekcijaMandati = document.getElementById('p_sekcija_osvojeni_mandati');
+    sekcijaMandati.innerHTML = "";
+    let brojacListe = 1;
+    zadnjeSortiraneListe.forEach(l => {
+        if (l.mandati > 0) {
+            let divLista = document.createElement('div');
+            divLista.style.marginBottom = "20px";
+            let htmlOsobe = "";
+            for (let i = 0; i < l.mandati; i++) {
+                let siroviPodaci = (l.kandidati && l.kandidati[i]) ? l.kandidati[i] : `Kandidat br. ${i+1}`;
+                
+                // Čišćenje baze od prefiksa "X. " radi izbjegavanja dupliranja u Zapisniku IV
+                let ocisceniPodaci = siroviPodaci.replace(/^\d+\.\s*/, "");
+                
+                htmlOsobe += `<li style="margin-bottom: 5px;">${ocisceniPodaci}</li>`;
+            }
+            divLista.innerHTML = `
+                <p style="margin: 5px 0 5px 0;"><strong>${brojacListe}. ${l.naziv}</strong> dobila je <strong>${l.mandati}</strong> mjesta u vijeću te su s te liste izabrani:</p>
+                <ol style="padding-left: 20px; margin-top: 5px;">${htmlOsobe}</ol>
+            `;
+            sekcijaMandati.appendChild(divLista);
+            brojacListe++;
+        }
+    });
+}
+// Ovu novu funkciju zalijepite odmah iznad "function osvjeziIPrintaj()"
+function izveziZapisnikUWord() {
+    // 1. Prvo osvježi sve podatke u skrivenom zapisniku
+    osvjeziPodatkeZapisnika();
+    
+    // 2. Uzmi čisti generirani HTML sadržaj zapisnika
+    const zapisnikElement = document.getElementById('zapisnik-print');
+    let sadrzajHtml = zapisnikElement.innerHTML;
+    
+    // Naziv datoteke prema odabranom mjesnom odboru
+    const moNaziv = document.getElementById('odabirMO').value || "Mjesni_Odbor";
+    const datotekaNaziv = `Zapisnik_MO_${moNaziv.replace(/\s+/g, '_')}.doc`;
+    
+    // 3. Pripremi čisti crno-bijeli Word HTML paket sa stilovima
+    const kompletanWordHtml = `
+    <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+    <head>
+        <meta charset="UTF-8">
+        <title>Zapisnik MO</title>
+        <style>
+            body {
+                font-family: 'Arial', 'Segoe UI', sans-serif;
+                font-size: 11pt;
+                color: #000000;
+                line-height: 1.4;
+                background-color: #ffffff;
+            }
+            p {
+                margin: 0 0 10pt 0;
+                text-align: justify;
+                color: #000000;
+            }
+            strong {
+                color: #000000;
+            }
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                margin-top: 12pt;
+                margin-bottom: 12pt;
+            }
+            th, td {
+                border: 1px solid #000000;
+                padding: 6pt;
+                text-align: left;
+                vertical-align: top;
+                color: #000000;
+                font-size: 10pt;
+            }
+            th {
+                background-color: #f2f2f2;
+                font-weight: bold;
+            }
+            ul, ol {
+                margin-top: 0;
+                margin-bottom: 10pt;
+                padding-left: 20pt;
+                color: #000000;
+            }
+            li {
+                margin-bottom: 4pt;
+                color: #000000;
+            }
+            .print-header-memorandum {
+                line-height: 1.3;
+                margin-bottom: 24pt;
+                font-size: 11pt;
+                color: #000000;
+            }
+            .print-section-title {
+                font-weight: bold;
+                margin-top: 20pt;
+                margin-bottom: 10pt;
+                font-size: 11pt;
+                text-align: center;
+                text-transform: uppercase;
+                color: #000000;
+            }
+            #p_sekcija_osvojeni_mandati div {
+                margin-bottom: 12pt;
+                color: #000000;
+            }
+        </style>
+    </head>
+    <body>
+        ${sadrzajHtml}
+    </body>
+    </html>
+    `;
+    
+    // 4. Stvori datoteku lokalno u pregledniku i pokreni preuzimanje
+    const blob = new Blob(['\ufeff' + kompletanWordHtml], {
+        type: 'application/msword;charset=utf-8'
+    });
+    
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = datotekaNaziv;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+function osvjeziIPrintaj() {
+    osvjeziPodatkeZapisnika();
+    window.print();
+}
+</script>
+
+</body>
+</html>

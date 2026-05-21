@@ -272,18 +272,28 @@ body {
 </div>
 
 <script>
-// Funkcija za provjeru lozinke koja se pokreće odmah
+// Funkcija za provjeru lozinke koja se pokreće odmah (s privremenom memorijom)
 (function() {
-    const točnaLozinka = "gipGospic2026"; // <-- Ovdje upišite lozinku koju želite!
+    const točnaLozinka = "gipGospic2026"; 
+
+    // 1. Provjeri je li lozinka već uspješno unesena u ovoj sesiji preglednika
+    if (sessionStorage.getItem("gip_autoriziran") === "da") {
+        document.documentElement.style.display = "block";
+        document.body.style.display = "block";
+        return; // Preskoči prompt i pusti korisnika na stranicu
+    }
+
+    // 2. Ako nije zapamćena, traži unos lozinke
     let unesenaLozinka = prompt("Sustav za obradu izbora MO Grad Gospić\n\nMolimo unesite lozinku za pristup:");
 
     if (unesenaLozinka === točnaLozinka) {
-        // Ako je lozinka točna, dopusti prikaz stranice
+        // Ako je lozinka točna, spremi podatak u memoriju sesije i dopusti prikaz stranice
+        sessionStorage.setItem("gip_autoriziran", "da");
         document.documentElement.style.display = "block";
         document.body.style.display = "block";
     } else {
         // Ako je lozinka kriva, blokiraj pristup
-        alert("Nestačna lozinka! Pristup je odbijen.");
+        alert("Netočna lozinka! Pristup je odbijen.");
         document.innerHTML = "";
         window.stop(); // Zaustavlja daljnje učitavanje skripte
     }

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<a href="index.html" style="display: inline-block; background: #319795; color: white; padding: 10px 15px; text-decoration: none; border-radius: 5px; font-weight: bold; margin-bottom: 15px;">📝 Idi na Službene Zapisnike</a>
+<a href="index.html" class="no-print" style="display: inline-block; background: #319795; color: white; padding: 10px 15px; text-decoration: none; border-radius: 5px; font-weight: bold; margin-bottom: 15px;">📝 Idi na Službene Zapisnike</a>
 <html lang="hr">
 <head>
     <meta charset="UTF-8">
@@ -62,12 +62,12 @@
         }
         .btn-print:hover { background-color: #2b6cb0; }
 
-       @media print {
+     @media print {
             body { background: white; margin: 0; padding: 0; }
             .app-container { box-shadow: none; border: none; padding: 0; }
             
-            /* OVDJE JE DODANA KLASA .footer-copyright DA SE SAKRIJE NA ISPISU */
-            .controls, .btn-print, #error-summary, .footer-copyright { display: none !important; }
+            /* Dodana klasa .no-print za skrivanje gornjeg linka na ispisu */
+            .no-print, .controls, .btn-print, #error-summary, .footer-copyright { display: none !important; }
             
             .table-container { border: 1px solid #000; width: 100%; overflow: visible; }
             table { width: 100%; font-size: 9.5pt; border-collapse: collapse; table-layout: auto; }

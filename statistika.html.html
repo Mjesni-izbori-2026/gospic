@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="hr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GIP Gospić - Statistički Unos Rezultata po BM</title>
+    <style>
+        body { font-family: 'Segoe UI', Arial, sans-serif; background-color: #f0f4f8; margin: 0; padding: 20px; color: #2d3748; }
+        .app-container { max-width: 1300px; margin: 0 auto; background: #ffffff; padding: 25px; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); border-top: 8px solid #1a365d; }
+        h1, h2, h3 { color: #1a365d; margin-top: 0; }
+        .header-section { border-bottom: 2px solid #e2e8f0; padding-bottom: 15px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
+        
+        .controls { display: flex; gap: 20px; margin-bottom: 25px; flex-wrap: wrap; align-items: center; background: #f7fafc; padding: 15px; border-radius: 8px; border: 1px solid #e2e8f0; }
+        .form-group { display: flex; flex-direction: column; }
+        label { font-weight: bold; font-size: 13px; color: #4a5568; margin-bottom: 5px; text-transform: uppercase; }
+        select { padding: 10px; border: 1px solid #cbd5e0; border-radius: 5px; font-size: 15px; min-width: 280px; background: white; font-weight: bold; color: #1a365d; }
+        
+        .table-container { overflow-x: auto; margin-bottom: 30px; border: 1px solid #e2e8f0; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
+        table { width: 100%; border-collapse: collapse; background: white; font-size: 14px; }
+        th, td { padding: 10px 8px; text-align: center; border-bottom: 1px solid #e2e8f0; border-right: 1px solid #e2e8f0; }
+        th { background-color: #1a365d; color: white; font-weight: 600; font-size: 12px; position: sticky; top: 0; text-transform: uppercase; letter-spacing: 0.5px; }
+        td:first-child, th:first-child { text-align: left; font-weight: bold; background-color: #ebf8ff; color: #2c5282; width: 250px; }
+        
+        input[type="number"] { width: 75px; padding: 6px; text-align: center; border: 1px solid #cbd5e0; border-radius: 4px; font-weight: bold; font-size: 14px; }
+        input[type="number"]:focus { border-color: #3182ce; outline: none; background: #ebf8ff; }
+        
+        .total-row td { background-color: #edf2f7; font-weight: bold; font-size: 14px; color: #1a202c; border-top: 2px solid #cbd5e0; border-bottom: 2px solid #cbd5e0; }
+        .total-row td:first-child { background-color: #e2e8f0; }
+        
+        .error-cell input { border: 2px solid #e53e3e; background-color: #fff5f5; color: #c53030; }
+        .math-status { font-size: 11px; font-weight: bold; margin-top: 3px; display: block; }
+        .status-ok { color: #38a169; }
+        .status-err { color: #e53e3e; }
+
+        .dashboard-grid { display: flex; gap: 20px; flex-wrap: wrap; margin-bottom: 25px; }
+        .dash-card { flex: 1; min-width: 240px; background: #f7fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 15px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+        .dash-card h4 { margin: 0 0 10px 0; color: #4a5568; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .dash-val { font-size: 24px; font-weight: bold; color: #1a365d; }
+
+        .results-section { display: flex; gap: 20px; flex-wrap: wrap; }
+        .result-card { flex: 15; min-width: 350px; background: #f7fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px; }
+        .mandate-badge { background: #38a169; color: white; padding: 4px 12px; border-radius: 12px; font-size: 14px; font-weight: bold; }
+        .list-result { padding: 10px 0; border-bottom: 1px dashed #cbd5e0; display: flex; justify-content: space-between; align-items: center; }
+        .list-result:last-child { border-bottom: none; }
+        
+        .alert-box { background-color: #fff5f5; border-left: 4px solid #e53e3e; color: #9b2c2c; padding: 12px; border-radius: 4px; margin-bottom: 20px; font-size: 14px; display: none; }
+    
+/* --- DODATAK ZA ISPIS I POTPIS --- */
+        .footer-copyright {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 15px;
+            border-top: 1px solid #cbd5e0;
+            color: #718096;
+            font-size: 13px;
+        }
+        .btn-print {
+            background-color: #3182ce; color: white; border: none; padding: 10px 20px; 
+            border-radius: 6px; font-size: 15px; font-weight: bold; cursor: pointer; 
+            margin-top: 20px; transition: background-color 0.2s;
+        }
+        .btn-print:hover { background-color: #2b6cb0; }
+
+       @media print {
+            body { background: white; margin: 0; padding: 0; }
+            .app-container { box-shadow: none; border: none; padding: 0; }
+            
+            /* OVDJE JE DODANA KLASA .footer-copyright DA SE SAKRIJE NA ISPISU */
+            .controls, .btn-print, #error-summary, .footer-copyright { display: none !important; }
+            
+            input[type="number"] { border: none; background: transparent; padding: 0; font-weight: bold; }
+            .table-container { border: 1px solid #000; }
+            table { font-size: 11pt; }
+            th, td { border: 1px solid #000 !important; }
+            .dashboard-grid { gap: 10px; margin-bottom: 15px; }
+            .dash-card, .result-card { border: 1px solid #000; padding: 10px; }
+            * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+        }
+
+</style>
+</head>
+<body>
+
+<div class="app-container">
+    <div class="header-section">
+        <div>
+            <h1>GIP Gospić — Izbori za vijeća mjesnih odbora 2026.</h1>
+            <p style="color: #4a5568; margin: 5px 0 0 0;">Unos podataka po biračkim mjestima s automatskim izračunom postotaka i D'Hondtovih mandata</p>
+<h2 id="ispis-mo-naslov" style="margin: 15px 0 0 0; color: #2b6cb0; display: none; text-transform: uppercase; letter-spacing: 0.5px;">
+            Obrada rezultata: Mjesni odbor <span id="ispis-mo-ime" style="color: #1a365d; font-weight: bold;"></span>
+        </h2>
+        </div>
+        <div style="background: #1a365d; color: white; padding: 8px 15px; border-radius: 6px; font-weight: bold; font-size: 14px;">
+            MANDATI PO MO: 5
+        </div>
+    </div>
+
+    <div class="controls">
+        <div class="form-group">
+            <label>Odaberite Mjesni odbor za obradu:</label>
+            <select id="mo-select" onchange="ucitajMjesniOdbor()">
+                <option value="">-- Odaberite s popisa mjesni odbor --</option>
+            </select>
+        </div>
+    </div>
+
+    <div id="error-summary" class="alert-box"></div>
+
+    <div id="workspace" style="display: none;">
+        <div class="dashboard-grid">
+            <div class="dash-card">
+                <h4>Ukupno Upisano Birača</h4>
+                <div class="dash-val" id="dash-upisano">0</div>
+            </div>
+            <div class="dash-card">
+                <h4>Ukupno Pristupilo (Kutija)</h4>
+                <div class="dash-val" id="dash-kutija">0</div>
+            </div>
+            <div class="dash-card" style="background: #ebf8ff;">
+                <h4>Postotak Izlaznosti</h4>
+                <div class="dash-val" id="dash-izlaznost" style="color: #2b6cb0;">0.00%</div>
+            </div>
+            <div class="dash-card">
+                <h4>Važeći / Nevažeći listići</h4>
+                <div class="dash-val" id="dash-listići" style="font-size: 18px; margin-top: 5px;">0 / 0</div>
+            </div>
+        </div>
+
+        <h3>1. Unos podataka iz zapisnika biračkih mjesta (BM)</h3>
+        <div class="table-container">
+            <table id="bm-table">
+                <thead id="bm-thead"></thead>
+                <tbody id="bm-tbody"></tbody>
+                <tfoot id="bm-tfoot"></tfoot>
+            </table>
+        </div>
+
+        <div class="results-section">
+            <div class="result-card">
+                <h3 style="margin-bottom: 15px; border-bottom: 2px solid #e2e8f0; padding-bottom: 5px; color: #2b6cb0;">Trenutni poredak i D'Hondtov raspored mandata</h3>
+               <div id="dhondt-results"></div>
+        </div>
+        
+        <div style="text-align: right;">
+            <button class="btn-print" onclick="window.print()">🖨️ Ispis / Preuzmi PDF</button>
+        </div>
+        
+    </div>
+
+    <div class="footer-copyright">
+        &copy; 2026. Josip Kovačević
+    </div>
+</div>
+
+<script>
+// Globalna memorija koja pamti sve unose za sve mjesne odbore
+let privremenaMemorijaRezultata = {};
+
+const bazaPodataka = {
+    "ALEKSINICA": { bms: [{id: 29, naziv: "Zgrada Osnovne škole Aleksinica"}], liste: ["HDZ", "KANDIDACIJSKA LISTA GRUPE BIRAČA"] },
+    "BARLETE": { bms: [{id: 11, naziv: "Zgrada Osnovne škole Bilaj"}], liste: ["LiPO"] },
+    "BILAJ": { bms: [{id: 10, naziv: "zgrada Osnovne škole Bilaj"}], liste: ["HDZ", "LiPO", "KANDIDACIJSKA LISTA GRUPE BIRAČA"] },
+    "BRUŠANE": { bms: [{id: 14, naziv: "Zgrada Osnovne škole Brušane"}], liste: ["HDZ", "LiPO"] },
+    "BUDAK": { bms: [{id: 15, naziv: "Čitaonica Budak"}], liste: ["HDZ", "LiPO"] },
+    "BUŽIM": { bms: [{id: 26, naziv: "Zgrada Osnovne škole Bužim"}], liste: ["HDZ", "LiPO"] },
+    "DEBELO BRDO": { bms: [{id: 25, naziv: "Zgrada Osnovne škole Debelo Brdo"}], liste: ["HDZ"] },
+    "DONJE PAZARIŠTE": { bms: [{id: 31, naziv: "zgrada Osnovne škole Novoselija"}], liste: ["HDZ", "LiPO"] },
+    "GOSPIĆ": { bms: [{id: 1, naziv: "Pučko otvoreno učilište"}, {id: 2, naziv: "Zgrada Hrvatske pošte"}, {id: 3, naziv: "Zgrada Doma zdravlja Gospić"}, {id: 4, naziv: "Zgrada Gimnazije u Gospiću"}, {id: 5, naziv: "Zgrada „Ličkih voda“ d.o.o."}], liste: ["HDZ", "HSP", "LiPO"] },
+    "KALINOVAČA": { bms: [{id: 30, naziv: "Zgrada Osnovne škole Kalinovača"}], liste: ["HDZ"] },
+    "KANIŽA": { bms: [{id: 6, naziv: "Zgrada Parka prirode Velebit"}], liste: ["HDZ", "LiPO"] },
+    "KLANAC": { bms: [{id: 28, naziv: "Zgrada Osnovne škole Klanac"}], liste: ["HDZ"] },
+    "LIČKI ČITLUK": { bms: [{id: 23, naziv: "Zgrada Doma zdravlja Gospić"}], liste: ["LiPO"] },
+    "LIČKI NOVI": { bms: [{id: 8, naziv: "Obiteljska kuća Gorana Grčevića"}], liste: ["HDZ", "LiPO"] },
+    "LIČKI OSIK": { bms: [{id: 17, naziv: "Zgrada Osnovne škole „Dr. F. Tuđmana“"}, {id: 18, naziv: "Obiteljska kuća Dragana Šopa"}], liste: ["HDZ", "HSP", "LiPO"] },
+    "LIČKI RIBNIK": { bms: [{id: 12, naziv: "Obiteljska kuća Ankice Šubarić,"}], liste: ["HDZ", "LiPO"] },
+    "MEDAK": { bms: [{id: 22, naziv: "prostorije Mjesnog odbora Medak"}], liste: ["LiPO"] },
+    "MOGORIĆ": { bms: [{id: 21, naziv: "Zgrada Mjesnog odbora Mogorić"}], liste: ["KANDIDACIJSKA LISTA GRUPE BIRAČA 1", "KANDIDACIJSKA LISTA GRUPE BIRAČA 2"] },
+    "MUŠALUK": { bms: [{id: 16, naziv: "Zgrada Osnovne škole Mušaluk"}], liste: ["LiPO"] },
+    "PODOŠTRA": { bms: [{id: 9, naziv: "Zgrada Hrvatskih cesta u Podoštri"}], liste: ["HDZ", "LiPO"] },
+    "SMILJAN": { bms: [{id: 24, naziv: "Zgrada Hrvatskog narodnog doma Smiljan"}, {id: 13, naziv: "MC Nikola Tesla"}], liste: ["HDZ", "HSP", "LiPO"] },
+    "ŠIROKA KULA": { bms: [{id: 19, naziv: "Osnovne škole Široka Kula"}], liste: ["HDZ", "LiPO"] },
+    "TRNOVAC": { bms: [{id: 13, naziv: "Zgrada Osnovne škole Trnovac"}], liste: ["HDZ", "LiPO"] },
+    "VELIKI ŽITNIK": { bms: [{id: 27, naziv: "Zgrada Osnovne škole Veliki Žitnik"}], liste: ["HDZ", "LiPO"] },
+    "VREBAC": { bms: [{id: 20, naziv: "Zgrada Društvenog doma Vrebac"}], liste: ["KANDIDACIJSKA LISTA GRUPE BIRAČA 1", "KANDIDACIJSKA LISTA GRUPE BIRAČA 2"] },
+    "ŽABICA": { bms: [{id: 7, naziv: "Čitaonica Žabica"}], liste: ["HDZ", "LiPO"] }
+};
+
+let trenutniOdbor = null;
+
+window.onload = function() {
+    const select = document.getElementById('mo-select');
+    Object.keys(bazaPodataka).sort().forEach(mo => {
+        let opt = document.createElement('option');
+        opt.value = mo;
+        opt.innerText = "Mjesni odbor " + mo;
+        select.appendChild(opt);
+    });
+};
+
+function ucitajMjesniOdbor() {
+    const moNaziv = document.getElementById('mo-select').value;
+    const workspace = document.getElementById('workspace');
+    document.getElementById('error-summary').style.display = 'none';
+    
+    if (!moNaziv) {
+        workspace.style.display = 'none';
+        return;
+    }
+    
+    trenutniOdbor = bazaPodataka[moNaziv];
+    workspace.style.display = 'block';
+// Upisivanje naziva mjesnog odbora u gornji naslov za ekran i ispis
+    document.getElementById('ispis-mo-ime').innerText = moNaziv;
+    document.getElementById('ispis-mo-naslov').style.display = 'block';
+    
+    const thead = document.getElementById('bm-thead');
+    let thHtml = `<tr>
+        <th>Biračko Mjesto (Lokacija)</th>
+        <th>Upisano birača</th>
+        <th>Glasovalo (Popis)</th>
+        <th>Glasovalo (Potvrde)</th>
+        <th>Ukupno u kutiji</th>
+        <th>Važeći listići</th>
+        <th>Nevažeći listići</th>`;
+    
+    trenutniOdbor.liste.forEach(lista => {
+        thHtml += `<th>${lista}</th>`;
+    });
+    thHtml += `</tr>`;
+    thead.innerHTML = thHtml;
+    
+    const tbody = document.getElementById('bm-tbody');
+    let tbHtml = '';
+    trenutniOdbor.bms.forEach((bm, rIdx) => {
+        tbHtml += `<tr id="bm-row-${rIdx}">
+            <td><strong>BM ${bm.id}</strong> - <span style="font-size:12px; font-weight:normal; color:#4a5568;">${bm.naziv}</span><br><span class="math-status" id="status-bm-${rIdx}"></span></td>
+            <td><input type="number" min="0" class="inp-upisano" data-row="${rIdx}" oninput="kalkulirajSve()"></td>
+            <td><input type="number" min="0" class="inp-popis" data-row="${rIdx}" oninput="kalkulirajSve()"></td>
+            <td><input type="number" min="0" class="inp-potvrde" data-row="${rIdx}" oninput="kalkulirajSve()"></td>
+            <td><input type="number" min="0" class="inp-kutija" data-row="${rIdx}" oninput="kalkulirajSve()"></td>
+            <td><input type="number" min="0" class="inp-vazeci" data-row="${rIdx}" oninput="kalkulirajSve()"></td>
+            <td><input type="number" min="0" class="inp-nevazeci" data-row="${rIdx}" oninput="kalkulirajSve()"></td>`;
+            
+        trenutniOdbor.liste.forEach((_, lIdx) => {
+            tbHtml += `<td><input type="number" min="0" class="inp-lista inp-lista-${lIdx}" data-row="${rIdx}" oninput="kalkulirajSve()"></td>`;
+        });
+        tbHtml += `</tr>`;
+    });
+    tbody.innerHTML = tbHtml;
+    
+    const tfoot = document.getElementById('bm-tfoot');
+    let tfHtml = `<tr class="total-row">
+        <td>UKUPNO ZA MJESNI ODBOR</td>
+        <td id="tot-upisano">0</td>
+        <td id="tot-popis">0</td>
+        <td id="tot-potvrde">0</td>
+        <td id="tot-kutija">0</td>
+        <td id="tot-vazeci">0</td>
+        <td id="tot-nevazeci">0</td>`;
+    
+    trenutniOdbor.liste.forEach((_, lIdx) => {
+        tfHtml += `<td id="tot-lista-${lIdx}">0</td>`;
+    });
+    tfHtml += `</tr>`;
+    tfoot.innerHTML = tfHtml;
+
+// [Ovaj dio ide na kraj funkcije ucitajMjesniOdbor, nakon što se tbody.innerHTML napuni]
+    
+    // Provjeri imamo li već spremljene podatke za ovaj mjesni odbor
+    if (privremenaMemorijaRezultata[moNaziv]) {
+        trenutniOdbor.bms.forEach((bm, rIdx) => {
+            const spremljenoBM = privremenaMemorijaRezultata[moNaziv][rIdx];
+            if (spremljenoBM) {
+                // Vrati osnovne statističke podatke
+                document.querySelector(`.inp-upisano[data-row="${rIdx}"]`).value = spremljenoBM.upisano || "";
+                document.querySelector(`.inp-popis[data-row="${rIdx}"]`).value = spremljenoBM.popis || "";
+                document.querySelector(`.inp-potvrde[data-row="${rIdx}"]`).value = spremljenoBM.potvrde || "";
+                document.querySelector(`.inp-kutija[data-row="${rIdx}"]`).value = spremljenoBM.kutija || "";
+                document.querySelector(`.inp-vazeci[data-row="${rIdx}"]`).value = spremljenoBM.vazeci || "";
+                document.querySelector(`.inp-nevazeci[data-row="${rIdx}"]`).value = spremljenoBM.nevazeci || "";
+                
+                // Vrati glasove za svaku pojedinu listu
+                trenutniOdbor.liste.forEach((_, lIdx) => {
+                    const glasoviListe = spremljenoBM.liste[lIdx];
+                    document.querySelector(`.inp-lista-${lIdx}[data-row="${rIdx}"]`).value = glasoviListe !== undefined ? glasoviListe : "";
+                });
+            }
+        });
+    }
+
+    kalkulirajSve();
+}    
+
+
+
+function kalkulirajSve() {
+    if (!trenutniOdbor) return;
+    const moNaziv = document.getElementById('mo-select').value;
+
+    let sumUpisano = 0, sumPopis = 0, sumPotvrde = 0, sumKutija = 0, sumVazeci = 0, sumNevazeci = 0;
+    let sumListe = new Array(trenutniOdbor.liste.length).fill(0);
+    let imaGresaka = false;
+    let opisGresaka = [];
+
+    trenutniOdbor.bms.forEach((bm, rIdx) => {
+        const rowEl = document.getElementById(`bm-row-${rIdx}`);
+        const statusEl = document.getElementById(`status-bm-${rIdx}`);
+        
+        let upisano = parseInt(document.querySelector(`.inp-upisano[data-row="${rIdx}"]`).value) || 0;
+        let popis = parseInt(document.querySelector(`.inp-popis[data-row="${rIdx}"]`).value) || 0;
+        let potvrde = parseInt(document.querySelector(`.inp-potvrde[data-row="${rIdx}"]`).value) || 0;
+        let kutija = parseInt(document.querySelector(`.inp-kutija[data-row="${rIdx}"]`).value) || 0;
+        let vazeci = parseInt(document.querySelector(`.inp-vazeci[data-row="${rIdx}"]`).value) || 0;
+        let nevazeci = parseInt(document.querySelector(`.inp-nevazeci[data-row="${rIdx}"]`).value) || 0;
+        
+        let zbrojGlasovaLista = 0;
+        for (let lIdx = 0; lIdx < trenutniOdbor.liste.length; lIdx++) {
+            let glasovi = parseInt(document.querySelector(`.inp-lista-${lIdx}[data-row="${rIdx}"]`).value) || 0;
+            zbrojGlasovaLista += glasovi;
+            sumListe[lIdx] += glasovi;
+        }
+
+        sumUpisano += upisano;
+        sumPopis += popis;
+        sumPotvrde += potvrde;
+        sumKutija += kutija;
+        sumVazeci += vazeci;
+        sumNevazeci += nevazeci;
+        
+        if (upisano > 0 || popis > 0 || kutija > 0 || vazeci > 0 || zbrojGlasovaLista > 0) {
+            let poruke = [];
+            if (kutija !== (vazeci + nevazeci)) poruke.push("Kutija ≠ Važeći + Nevažeći");
+            if (zbrojGlasovaLista !== vazeci) poruke.push("Zbroj glasova lista ≠ Važeći");
+            if (kutija > (popis + potvrde)) poruke.push("Kutija > Broj glasača u popisu");
+            
+            if (poruke.length > 0) {
+                rowEl.classList.add('error-cell');
+                statusEl.innerText = "❌ " + poruke.join(", ");
+                statusEl.className = "math-status status-err";
+                imaGresaka = true;
+                opisGresaka.push(`BM ${bm.id} (${bm.naziv}): ${poruke.join(", ")}`);
+            } else {
+                rowEl.classList.remove('error-cell');
+                statusEl.innerText = "✅ U redu";
+                statusEl.className = "math-status status-ok";
+            }
+        } else {
+            rowEl.classList.remove('error-cell');
+            statusEl.innerText = "";
+        }
+
+// [Dodati unutar petlje biračkih mjesta u funkciji kalkulirajSve]
+        
+        // Ako objekt za ovaj MO još ne postoji u memoriji, stvori ga
+        if (!privremenaMemorijaRezultata[moNaziv]) {
+            privremenaMemorijaRezultata[moNaziv] = {};
+        }
+        
+        // Spremi trenutno stanje ćelija ovog biračkog mjesta u memoriju
+        let glasoviPoListama = [];
+        for (let lIdx = 0; lIdx < trenutniOdbor.liste.length; lIdx++) {
+            glasoviPoListama.push(parseInt(document.querySelector(`.inp-lista-${lIdx}[data-row="${rIdx}"]`).value) || 0);
+        }
+        
+        privremenaMemorijaRezultata[moNaziv][rIdx] = {
+            upisano: parseInt(document.querySelector(`.inp-upisano[data-row="${rIdx}"]`).value) || 0,
+            popis: parseInt(document.querySelector(`.inp-popis[data-row="${rIdx}"]`).value) || 0,
+            potvrde: parseInt(document.querySelector(`.inp-potvrde[data-row="${rIdx}"]`).value) || 0,
+            kutija: parseInt(document.querySelector(`.inp-kutija[data-row="${rIdx}"]`).value) || 0,
+            vazeci: parseInt(document.querySelector(`.inp-vazeci[data-row="${rIdx}"]`).value) || 0,
+            nevazeci: parseInt(document.querySelector(`.inp-nevazeci[data-row="${rIdx}"]`).value) || 0,
+            liste: glasoviPoListama
+        };
+    });
+    
+    document.getElementById('tot-upisano').innerText = sumUpisano;
+    document.getElementById('tot-popis').innerText = sumPopis;
+    document.getElementById('tot-potvrde').innerText = sumPotvrde;
+    document.getElementById('tot-kutija').innerText = sumKutija;
+    document.getElementById('tot-vazeci').innerText = sumVazeci;
+    document.getElementById('tot-nevazeci').innerText = sumNevazeci;
+    for (let lIdx = 0; lIdx < sumListe.length; lIdx++) {
+        document.getElementById(`tot-lista-${lIdx}`).innerText = sumListe[lIdx];
+    }
+    
+    // Dashboard ažuriranje
+    document.getElementById('dash-upisano').innerText = sumUpisano;
+    document.getElementById('dash-kutija').innerText = sumKutija;
+    document.getElementById('dash-listići').innerText = `${sumVazeci} / ${sumNevazeci}`;
+    
+    let izlaznostPostotak = sumUpisano > 0 ? (sumKutija / sumUpisano * 100) : 0;
+    document.getElementById('dash-izlaznost').innerText = izlaznostPostotak.toFixed(2) + "%";
+    
+    const errBox = document.getElementById('error-summary');
+    if (imaGresaka) {
+        errBox.innerHTML = `<strong>Uočene matematičke pogreške na biračkim mjestima:</strong><br><ul><li>${opisGresaka.join('</li><li>')}</li></ul>`;
+        errBox.style.display = 'block';
+    } else {
+        errBox.style.display = 'none';
+    }
+
+    izracunajMandateDHondt(sumListe, sumVazeci);
+}
+
+function izracunajMandateDHondt(sumListe, sumVazeci) {
+    const prag = sumVazeci * 0.05;
+    let rezultati = [];
+    let kolicnici = [];
+    
+    for (let i = 0; i < trenutniOdbor.liste.length; i++) {
+        let glasovi = sumListe[i];
+        let postotak = sumVazeci > 0 ? (glasovi / sumVazeci * 100) : 0;
+        let presaoPrag = glasovi >= prag && sumVazeci > 0;
+        
+        rezultati.push({
+            naziv: trenutniOdbor.liste[i],
+            glasovi: glasovi,
+            postotak: postotak,
+            presaoPrag: presaoPrag,
+            mandati: 0
+        });
+        
+        if (presaoPrag && glasovi > 0) {
+            for (let m = 1; m <= 5; m++) {
+                kolicnici.push({ listIdx: i, val: glasovi / m });
+            }
+        }
+    }
+    
+    kolicnici.sort((a, b) => b.val - a.val);
+    for (let i = 0; i < Math.min(5, kolicnici.length); i++) {
+        rezultati[kolicnici[i].listIdx].mandati++;
+    }
+    
+    rezultati.sort((a, b) => b.glasovi - a.glasovi);
+    
+    let resHtml = '';
+    rezultati.forEach((rez, idx) => {
+        let statusPraga = rez.presaoPrag ? "" : " <span style='color:#e53e3e; font-size:11px;'>(Nije prešao prag 5%)</span>";
+        resHtml += `
+            <div class="list-result">
+                <div>
+                    <strong style="font-size:15px;">${idx + 1}. ${rez.naziv}</strong>${statusPraga}<br>
+                    <span style="color:#4a5568; font-size:13px;">Osvojeno glasova: <strong>${rez.glasovi}</strong> (${rez.postotak.toFixed(2)}%)</span>
+                </div>
+                <div>
+                    <span class="mandate-badge" style="background:${rez.mandati > 0 ? '#38a169' : '#cbd5e0'};">${rez.mandati} članova</span>
+                </div>
+            </div>
+        `;
+    });
+    document.getElementById('dhondt-results').innerHTML = resHtml;
+}
+</script>
+</body>
+</html>

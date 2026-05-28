@@ -413,7 +413,12 @@ function vratiRijecGlas(broj) {
     }
     return "glasova";
 }
-	
+function vratiRijecMjesto(broj) {
+    if (broj === 1) {
+        return "mjesto";
+    }
+    return "mjesta";
+}	
 const podaciIzbora = {
     "ALEKSINICA": { klasa: "012-02/26-01/27", urbroj: "2125-1-01-26-4", liste: [
         { naziv: "HRVATSKA DEMOKRATSKA ZAJEDNICA - HDZ", nositelj: "JURAJ VRKLJAN", kandidati: ["1. Juraj Vrkljan", "2. Milan Butorac", "3. Josip Rukavina", "4. Ivana Marinić", "5.Ivica Šnjarić"] },
@@ -758,7 +763,8 @@ function osvjeziPodatkeZapisnika() {
                 htmlOsobe += `<li style="margin-bottom: 5px;">${ocisceniPodaci}</li>`;
             }
         divLista.innerHTML = `
-                <p style="margin: 5px 0 5px 0;"><strong>${brojacListe}. ${l.naziv}</strong>, nositelj liste <strong>${l.nositelj}</strong>, dobila je <strong>${l.mandati}</strong> mjesta u vijeću te su s te liste izabrani:</p>
+                divLista.innerHTML = `
+                <p style="margin: 5px 0 5px 0;"><strong>${brojacListe}. ${l.naziv}</strong>, nositelj liste <strong>${l.nositelj}</strong>, dobila je <strong>${l.mandati}</strong> ${vratiRijecMjesto(l.mandati)} u vijeću te su s te liste izabrani:</p>
                 <ol style="padding-left: 20px; margin-top: 5px;">${htmlOsobe}</ol>
             `;
             sekcijaMandati.appendChild(divLista);

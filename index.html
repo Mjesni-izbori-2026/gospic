@@ -739,7 +739,7 @@ function osvjeziPodatkeZapisnika() {
                 
                 htmlOsobe += `<li style="margin-bottom: 5px;">${ocisceniPodaci}</li>`;
             }
-          divLista.innerHTML = `
+        divLista.innerHTML = `
                 <p style="margin: 5px 0 5px 0;"><strong>${brojacListe}. ${l.naziv}</strong>, nositelj liste <strong>${l.nositelj}</strong>, dobila je <strong>${l.mandati}</strong> mjesta u vijeću te su s te liste izabrani:</p>
                 <ol style="padding-left: 20px; margin-top: 5px;">${htmlOsobe}</ol>
             `;
@@ -891,10 +891,11 @@ function generirajIPrintajOMS12() {
     const upisanoBiraca = parseInt(document.getElementById("statUpisano").value) || 0;
     const glasovaloPrekoIzvatka = parseInt(document.getElementById("statGlasovalo").value) || 0;
     const glasovaloPrekoPotvrde = parseInt(document.getElementById("statPotvrde").value) || 0;
+    const listiciUKutiji = parseInt(document.getElementById("statU_Kutiji").value) || 0; // Dodano polje za listiće u kutiji
     const nevazeciListici = parseInt(document.getElementById("statNevažeći").value) || 0;
     
     const ukupnoGlasovalo = glasovaloPrekoIzvatka + glasovaloPrekoPotvrde;
-    const vazeciListici = ukupnoGlasovalo - nevazeciListici;
+    const vazeciListici = listiciUKutiji - nevazeciListici; //  SADA RAČUNA: U kutiji - Nevažeći
 
     // Popunjavanje općih polja
     document.getElementById("oms_naslovMO").innerText = "MJESNOG ODBORA " + kodMO;

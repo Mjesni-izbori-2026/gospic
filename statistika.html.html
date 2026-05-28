@@ -112,15 +112,15 @@
     <div id="workspace" style="display: none;">
         <div class="dashboard-grid">
             <div class="dash-card">
-                <h4>Ukupno Upisano Birača</h4>
+                <h4>Ukupno upisano birača</h4>
                 <div class="dash-val" id="dash-upisano">0</div>
             </div>
             <div class="dash-card">
-                <h4>Ukupno Pristupilo (Kutija)</h4>
+                <h4>Ukupno listića u kutiji</h4>
                 <div class="dash-val" id="dash-kutija">0</div>
             </div>
             <div class="dash-card" style="background: #ebf8ff;">
-                <h4>Postotak Izlaznosti</h4>
+                <h4>Postotak izlaznosti</h4>
                 <div class="dash-val" id="dash-izlaznost" style="color: #2b6cb0;">0.00%</div>
             </div>
             <div class="dash-card">
@@ -391,8 +391,10 @@ function kalkulirajSve() {
     document.getElementById('dash-kutija').innerText = sumKutija;
     document.getElementById('dash-listići').innerText = `${sumVazeci} / ${sumNevazeci}`;
     
-    let izlaznostPostotak = sumUpisano > 0 ? (sumKutija / sumUpisano * 100) : 0;
-    document.getElementById('dash-izlaznost').innerText = izlaznostPostotak.toFixed(2) + "%";
+    // Izračun izlaznosti prema formuli: (popis + potvrde) / upisano
+let ukupnoPristupiloBiraca = sumPopis + sumPotvrde;
+let izlaznostPostotak = sumUpisano > 0 ? (ukupnoPristupiloBiraca / sumUpisano * 100) : 0;
+document.getElementById('dash-izlaznost').innerText = izlaznostPostotak.toFixed(2) + "%";
     
     const errBox = document.getElementById('error-summary');
     if (imaGresaka) {

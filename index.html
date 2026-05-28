@@ -739,8 +739,8 @@ function osvjeziPodatkeZapisnika() {
                 
                 htmlOsobe += `<li style="margin-bottom: 5px;">${ocisceniPodaci}</li>`;
             }
-            divLista.innerHTML = `
-                <p style="margin: 5px 0 5px 0;"><strong>${brojacListe}. ${l.naziv}</strong> dobila je <strong>${l.mandati}</strong> mjesta u vijeću te su s te liste izabrani:</p>
+          divLista.innerHTML = `
+                <p style="margin: 5px 0 5px 0;"><strong>${brojacListe}. ${l.naziv}</strong>, nositelj liste <strong>${l.nositelj}</strong>, dobila je <strong>${l.mandati}</strong> mjesta u vijeću te su s te liste izabrani:</p>
                 <ol style="padding-left: 20px; margin-top: 5px;">${htmlOsobe}</ol>
             `;
             sekcijaMandati.appendChild(divLista);

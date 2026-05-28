@@ -102,33 +102,28 @@ body {
     <div id="glavnaSekcija" style="display: none;">
         <h3>2. Statistički podaci o glasačkim listićima i biračima</h3>
         <div class="stat-box">
-            <div class="row">
-                <div class="col form-group">
-                    <label for="statPreuzeto">Preuzeto glasačkih listića:</label>
-                    <input type="number" id="statPreuzeto" value="0" min="0">
-                </div>
-                <div class="col form-group">
-                    <label for="statNeupotrebljeno">Broj neupotrijebljenih glasačkih listića:</label>
-                    <input type="number" id="statNeupotrebljeno" value="0" min="0">
-                </div>
-                <div class="col form-group">
-                    <label for="statUpisano">Ukupno upisano birača na ovom području:</label>
-                    <input type="number" id="statUpisano" value="0" min="0">
-                </div>
-            </div>
-            <div class="row">
-                <div class="col form-group">
-                    <label for="statGlasovalo">Glasovalo birača prema izvatku iz popisa:</label>
-                    <input type="number" id="statGlasovalo" value="0" min="0">
-                </div>
-                <div class="col form-group">
-                    <label for="statPotvrde">Glasovalo temeljem potvrde o upisu:</label>
-                    <input type="number" id="statPotvrde" value="0" min="0">
-                </div>
-                <div class="col form-group">
-                    <label for="statNevažeći">Broj nevažećih glasačkih listića:</label>
-                    <input type="number" id="statNevažeći" value="0" min="0">
-                </div>
+           <div class="row">
+    <div class="col form-group">
+        <label for="statUpisano">Ukupno upisano birača:</label>
+        <input type="number" id="statUpisano" value="0" min="0">
+    </div>
+    <div class="col form-group">
+        <label for="statGlasovalo">Pristupilo glasovanju (popis):</label>
+        <input type="number" id="statGlasovalo" value="0" min="0">
+    </div>
+    <div class="col form-group">
+        <label for="statPotvrde">Pristupilo glasovanju (potvrde):</label>
+        <input type="number" id="statPotvrde" value="0" min="0">
+    </div>
+    <div class="col form-group">
+        <label for="statU_Kutiji">Broj glasačkih listića u kutiji:</label>
+        <input type="number" id="statU_Kutiji" value="0" min="0" style="border-color: #319795; font-weight: bold;">
+    </div>
+    <div class="col form-group">
+        <label for="statNevažeći">Broj nevažećih listića:</label>
+        <input type="number" id="statNevažeći" value="0" min="0">
+    </div>
+</div>
             </div>
         </div>
 
@@ -140,7 +135,7 @@ body {
         </div>
     </div>
 
-    <div id="rezultatiSekcija" style="display:none; margin-top: 30px;">
+    <div class="no-print" div id="rezultatiSekcija" style="display:none; margin-top: 30px;">
         <h2>Kontrolni prikaz izračuna</h2>
         <table id="tablicaRezultata">
             <thead>
@@ -174,6 +169,7 @@ body {
         REPUBLIKA HRVATSKA<br>
         LIČKO-SENJSKA ŽUPANIJA<br>
         <strong>GRAD GOSPIĆ</strong><br>
+<strong>GRADSKO VIJEĆE</strong><br>
         <strong>Gradsko izborno povjerenstvo</strong><br>
         KLASA: <span id="p_klasa">-</span><br>
         URBROJ: <span id="p_urbroj">-</span><br>
@@ -189,43 +185,15 @@ body {
         <strong id="p_naslovMO" style="font-size: 17px; text-transform: uppercase;">MJESNOG ODBORA -</strong>
     </div>
 
-    <div class="print-section-title">I.</div>
-    <table>
-        <tbody>
-            <tr>
-                <td>Birački odbor preuzeo je ukupno glasačkih listića</td>
-                <td style="text-align: right; font-weight: bold; width: 100px;" id="p_preuzeto">-</td>
-            </tr>
-            <tr>
-                <td>Broj neupotrijebljenih glasačkih listića</td>
-                <td style="text-align: right;" id="p_neupotrijebljeno">-</td>
-            </tr>
-            <tr>
-                <td>Ukupno upisano birača na ovom području</td>
-                <td style="text-align: right; font-weight: bold;" id="p_upisano">-</td>
-            </tr>
-            <tr>
-                <td>Glasovalo birača prema izvatku iz popisa birača</td>
-                <td style="text-align: right;" id="p_glasovalo">-</td>
-            </tr>
-            <tr>
-                <td>Glasovalo birača temeljem potvrde o upisu u popis birača</td>
-                <td style="text-align: right;" id="p_potvrde">-</td>
-            </tr>
-            <tr>
-                <td>Ukupno glasovalo birača (prema listićima u kutiji)</td>
-                <td style="text-align: right; font-weight: bold;" id="p_ukupnoGlasovalo">-</td>
-            </tr>
-            <tr>
-                <td>Broj važećih glasačkih listića</td>
-                <td style="text-align: right; color: #000; font-weight: bold;" id="p_vazeci">-</td>
-            </tr>
-            <tr>
-                <td>Broj nevažećih glasačkih listića</td>
-                <td style="text-align: right; color: #000;" id="p_nevazeci">-</td>
-            </tr>
-        </tbody>
-    </table>
+   <div class="print-section-title">I.</div>
+<p style="text-align: justify; line-height: 1.8; margin-top: 10px; margin-bottom: 20px; font-size: 14px;">
+    Od ukupno <strong id="p_upisano">-</strong> birača upisanih u popis birača, glasovanju je pristupilo 
+    <strong id="p_pristupiloTotal">-</strong> birača, odnosno <strong id="p_pristupiloPostotak">-</strong>, 
+    od čega je prema glasačkim listićima glasovalo <strong id="p_glasovaloListici">-</strong> birača, odnosno 
+    <strong id="p_glasovaloListiciPostotak">-</strong>. 
+    Važećih listića bilo je <strong id="p_vazeci">-</strong> odnosno <strong id="p_vazeciPostotak">-</strong>. 
+    Nevažećih listića bilo je <strong id="p_nevazeci">-</strong>, odnosno <strong id="p_nevazeciPostotak">-</strong>.
+</p>
 
     <div class="print-section-title">II.</div>
     <p style="margin-bottom: 5px;">Pojedine kandidacijske liste dobile su sljedeći broj glasova:</p>
@@ -277,6 +245,7 @@ body {
     <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px;">
         <div>
             <strong>GRAD GOSPIĆ</strong><br>
+			<strong>GRADSKO VIJEĆE</strong><br>
             <strong>GRADSKO IZBORNO POVJERENSTVO</strong>
         </div>
         <div style="border: 1px solid #000; padding: 5px 15px; font-weight: bold; font-size: 16px;">
@@ -498,8 +467,8 @@ const podaciIzbora = {
         { naziv: "LiPO", nositelj: "MIRJANA TRAVICA", kandidati: ["1. Mirjana Travica", "2. Marija Levnaić", "3. Milena Marković", "4. Mileva Potrebić", "5. Milan Kuprešanin"] }
     ]},
     "MOGORIĆ": { klasa: "012-02/26-01/17", urbroj: "2125-1-01-26-5", liste: [
-        { naziv: "KANDIDACIJSKA LISTA GRUPE BIRAČA MJESNOG ODBORA MOGORIĆ 1", nositelj: "DUŠAN BORIĆ", kandidati: ["1. Dušan Borić", "2. Anka Milojević", "3. Mladen Milojević", "4. Milan Borić", "5. Mileva Polovina"] },
-        { naziv: "KANDIDACIJSKA LISTA GRUPE BIRAČA MJESNOG ODBORA MOGORIĆ 2", nositelj: "BOGDAN IVANČEVIĆ", kandidati: ["1. Bogdan Ivančević", "2. Milan Džodan", "3. Dragica Čuturilo", "4. Anka Njegomir - Ivančević", "5. Mile Čuturilo"] }
+        { naziv: "KANDIDACIJSKA LISTA GRUPE BIRAČA MJESNOG ODBORA MOGORIĆ", nositelj: "DUŠAN BORIĆ", kandidati: ["1. Dušan Borić", "2. Anka Milojević", "3. Mladen Milojević", "4. Milan Borić", "5. Mileva Polovina"] },
+        { naziv: "KANDIDACIJSKA LISTA GRUPE BIRAČA MJESNOG ODBORA MOGORIĆ", nositelj: "BOGDAN IVANČEVIĆ", kandidati: ["1. Bogdan Ivančević", "2. Milan Džodan", "3. Dragica Čuturilo", "4. Anka Njegomir - Ivančević", "5. Mile Čuturilo"] }
     ]},
     "MUŠALUK": { klasa: "012-02/26-01/46", urbroj: "2125-1-01-26-3", liste: [
         { naziv: "LiPO", nositelj: "MILE HOLJEVAC", kandidati: ["1. Mile Holjevac", "2. Mirna Holjevac", "3. Josip Horvatović", "4.  Nikica Šimatović", "5. Ivan Žarak"] }
@@ -528,8 +497,8 @@ const podaciIzbora = {
         { naziv: "LiPO", nositelj: "ANTE STARČEVIĆ", kandidati: ["1. Ante Starčević", "2. Tomislava Javor Starčević", "3. Ivica Balenović", "4. Verka Starčević", "5. Katica Starčević"] }
     ]},
     "VREBAC": { klasa: "012-02/26-01/16", urbroj: "2125-1-01-26-4", liste: [
-        { naziv: "KANDIDACIJSKA LISTA GRUPE BIRAČA MJESNOG ODBORA VREBAC 1", nositelj: "MILAN DRAGOSAVAC", kandidati: ["1. Milan Dragosavac", "2. Milorad Krajnović", "3. Marija Barać", "4. Jovo Cetina", "5. Dušanka Krajnović"] },
-        { naziv: "KANDIDACIJSKA LISTA GRUPE BIRAČA MJESNOG ODBORA VREBAC 2", nositelj: "MILOŠ POPOVIĆ", kandidati: ["1. Miloš Popović", "2. Kata Dragosavac", "3. Dušan Njegomir", "4. Duško Novković", "5. Sandra Novković"] }
+        { naziv: "KANDIDACIJSKA LISTA GRUPE BIRAČA MJESNOG ODBORA VREBAC", nositelj: "MILAN DRAGOSAVAC", kandidati: ["1. Milan Dragosavac", "2. Milorad Krajnović", "3. Marija Barać", "4. Jovo Cetina", "5. Dušanka Krajnović"] },
+        { naziv: "KANDIDACIJSKA LISTA GRUPE BIRAČA MJESNOG ODBORA VREBAC", nositelj: "MILOŠ POPOVIĆ", kandidati: ["1. Miloš Popović", "2. Kata Dragosavac", "3. Dušan Njegomir", "4. Duško Novković", "5. Sandra Novković"] }
     ]},
     "ŽABICA": { klasa: "012-02/26-01/43", urbroj: "2125-1-01-26-4", liste: [
         { naziv: "HRVATSKA DEMOKRATSKA ZAJEDNICA - HDZ", nositelj: "JOSIP ZDUNIĆ", kandidati: ["1. Josip Zdunić", "2. Krešimir Ban", "3. Milan Ban", "4. Ivan Škulj", "5. Ivan Zdunić"] },
@@ -665,32 +634,66 @@ function obradiIzborneRezultate() {
 
 function osvjeziPodatkeZapisnika() {
     const moKljuc = document.getElementById('odabirMO').value;
-    const preuzeto = document.getElementById('statPreuzeto').value || "0";
-    const neupotrebljeno = document.getElementById('statNeupotrebljeno').value || "0";
-    const upisano = document.getElementById('statUpisano').value || "0";
-    const glasovaloPopis = document.getElementById('statGlasovalo').value || "0";
-    const glasovaloPotvrde = document.getElementById('statPotvrde').value || "0";
+    const upisano = parseInt(document.getElementById('statUpisano').value) || 0;
+    const glasovaloPopis = parseInt(document.getElementById('statGlasovalo').value) || 0;
+    const glasovaloPotvrde = parseInt(document.getElementById('statPotvrde').value) || 0;
+    const listiciUKutiji = parseInt(document.getElementById('statU_Kutiji').value) || 0;
     const nevazeciListici = parseInt(document.getElementById('statNevažeći').value) || 0;
 
-    let ukupnoVazecih = 0;
-    zadnjeSortiraneListe.forEach(l => { ukupnoVazecih += l.glasovi; });
-    let ukupnoKutija = ukupnoVazecih + nevazeciListici;
+    // Pristupilo ukupno = redovni iz popisa + oni s potvrdom
+    const ukupnoPristupilo = glasovaloPopis + glasovaloPotvrde;
+    
+    // Važeći listići = Listići u kutiji MINUS nevažeći listići
+    const ukupnoVazecih = Math.max(0, listiciUKutiji - nevazeciListici);
 
+    // Osnovni tekstualni podaci za zaglavlje zapisnika
     document.getElementById('p_klasa').innerText = document.getElementById('inputKlasa').value || "-";
     document.getElementById('p_urbroj').innerText = document.getElementById('inputUrbroj').value || "-";
     document.getElementById('p_datum').innerText = document.getElementById('inputDatum').value || "-";
     document.getElementById('p_datum_potpis').innerText = document.getElementById('inputDatum').value || "-";
     document.getElementById('p_naslovMO').innerText = "MJESNOG ODBORA " + moKljuc;
 
-    document.getElementById('p_preuzeto').innerText = preuzeto;
-    document.getElementById('p_neupotrijebljeno').innerText = neupotrebljeno;
+    // Popunjavanje brojčanih vrijednosti u novu rečenicu Točke I.
     document.getElementById('p_upisano').innerText = upisano;
-    document.getElementById('p_glasovalo').innerText = glasovaloPopis;
-    document.getElementById('p_potvrde').innerText = glasovaloPotvrde;
-    document.getElementById('p_ukupnoGlasovalo').innerText = ukupnoKutija;
+    document.getElementById('p_pristupiloTotal').innerText = ukupnoPristupilo;
+    document.getElementById('p_glasovaloListici').innerText = listiciUKutiji;
     document.getElementById('p_vazeci').innerText = ukupnoVazecih;
     document.getElementById('p_nevazeci').innerText = nevazeciListici;
+    
+    // Prikaz zajedničkog djelitelja (potrebno za d'Hondta)
     document.getElementById('p_zajednickiDjelitelj').innerText = zadnjiZajednickiDjelitelj > 0 ? zadnjiZajednickiDjelitelj.toFixed(5) : "0.00000";
+
+    // --- RAČUNANJE POSTOTAKA ---
+
+    // 1. Postotak onih koji su PRISTUPILI u odnosu na upisane
+    if (upisano > 0) {
+        const pristupiloPostotak = ((ukupnoPristupilo / upisano) * 100).toFixed(2);
+        document.getElementById("p_pristupiloPostotak").innerText = pristupiloPostotak + "%";
+    } else {
+        document.getElementById("p_pristupiloPostotak").innerText = "0.00%";
+    }
+
+    // 2. Postotak onih koji su GLASOVALI PREMA LISTIĆIMA u odnosu na upisane
+    if (upisano > 0) {
+        const glasovaloListiciPostotak = ((listiciUKutiji / upisano) * 100).toFixed(2);
+        document.getElementById("p_glasovaloListiciPostotak").innerText = glasovaloListiciPostotak + "%";
+    } else {
+        document.getElementById("p_glasovaloListiciPostotak").innerText = "0.00%";
+    }
+
+    // 3. Postotak VAŽEĆIH i NEVAŽEĆIH listića u odnosu na broj listića U KUTIJI
+    if (listiciUKutiji > 0) {
+        const vazeciPostotak = ((ukupnoVazecih / listiciUKutiji) * 100).toFixed(2);
+        const nevazeciPostotak = ((nevazeciListici / listiciUKutiji) * 100).toFixed(2);
+        
+        document.getElementById("p_vazeciPostotak").innerText = vazeciPostotak + "%";
+        document.getElementById("p_nevazeciPostotak").innerText = nevazeciPostotak + "%";
+    } else {
+        document.getElementById("p_vazeciPostotak").innerText = "0.00%";
+        document.getElementById("p_nevazeciPostotak").innerText = "0.00%";
+    }
+
+
 
     const pTablicaGlasovi = document.getElementById('p_tablica_glasovi_body');
     pTablicaGlasovi.innerHTML = "";
@@ -711,7 +714,7 @@ function osvjeziPodatkeZapisnika() {
         if (l.presaoPrag) {
             let tr = document.createElement('tr');
             tr.innerHTML = `
-                <td><strong>${l.naziv}</strong></td>
+                <td><strong>${l.naziv}</strong><br>Nositelj kandidacijske liste: ${l.nositelj}</td>
                 <td style="text-align: right;">${l.glasovi}</td>
                 <td style="text-align: right;">${l.zadnjiKolicnik > 0 ? l.zadnjiKolicnik.toFixed(5) : '0.00000'}</td>
                 <td style="text-align: center; font-weight: bold; font-size: 15px;">${l.mandati}</td>

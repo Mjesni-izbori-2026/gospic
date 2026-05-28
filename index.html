@@ -396,6 +396,24 @@ body {
         window.stop(); // Zaustavlja daljnje učitavanje skripte
     }
 })();
+function vratiRijecGlas(broj) {
+    // Ako su zadnje dvije znamenke 11, 12, 13 ili 14, pravilo za jedinične znamenke ne vrijedi (npr. 11 glasova, 12 glasova)
+    const zadnjeDvije = broj % 100;
+    if (zadnjeDvije >= 11 && zadnjeDvije <= 14) {
+        return "glasova";
+    }
+
+    // Gledamo samo zadnju znamenku broja
+    const zadnjaZnamenka = broj % 10;
+    if (zadnjaZnamenka === 1) {
+        return "glas";
+    }
+    if (zadnjaZnamenka >= 2 && zadnjaZnamenka <= 4) {
+        return "glasa";
+    }
+    return "glasova";
+}
+	
 const podaciIzbora = {
     "ALEKSINICA": { klasa: "012-02/26-01/27", urbroj: "2125-1-01-26-4", liste: [
         { naziv: "HRVATSKA DEMOKRATSKA ZAJEDNICA - HDZ", nositelj: "JURAJ VRKLJAN", kandidati: ["1. Juraj Vrkljan", "2. Milan Butorac", "3. Josip Rukavina", "4. Ivana Marinić", "5.Ivica Šnjarić"] },
@@ -940,7 +958,7 @@ function generirajIPrintajOMS12() {
             const brojGlasova = inputElement ? (parseInt(inputElement.value) || 0) : 0;
             
             // Formatiranje točke II. prema službenom predlošku
-            listeHtml += `<p style="margin: 6px 0; padding-left: 15px;"><strong>${index + 1}.</strong> Kandidacijska lista <strong>${lista.naziv}</strong>, nositelj liste <strong>${lista.nositelj}</strong>, dobila je <strong>${brojGlasova}</strong> glasova</p>`;
+            listeHtml += `<p style="margin: 6px 0; padding-left: 15px;"><strong>${index + 1}.</strong> Kandidacijska lista <strong>${lista.naziv}</strong>, nositelj liste <strong>${lista.nositelj}</strong>, dobila je <strong>${brojGlasova}</strong> ${vratiRijecGlas(brojGlasova)}</p>`;
         });
     }
     

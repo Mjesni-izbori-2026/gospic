@@ -406,7 +406,11 @@ document.getElementById('dash-izlaznost').innerText = izlaznostPostotak.toFixed(
 
     izracunajMandateDHondt(sumListe, sumVazeci);
 }
-
+function deklinacijaClanova(broj) {
+    if (broj === 1) return "član";
+    if (broj >= 2 && broj <= 4) return "člana";
+    return "članova";
+}
 function izracunajMandateDHondt(sumListe, sumVazeci) {
     const prag = sumVazeci * 0.05;
     let rezultati = [];
@@ -449,7 +453,7 @@ function izracunajMandateDHondt(sumListe, sumVazeci) {
                     <span style="color:#4a5568; font-size:13px;">Osvojeno glasova: <strong>${rez.glasovi}</strong> (${rez.postotak.toFixed(2)}%)</span>
                 </div>
                 <div>
-                    <span class="mandate-badge" style="background:${rez.mandati > 0 ? '#38a169' : '#cbd5e0'};">${rez.mandati} članova</span>
+                    <span class="mandate-badge" style="background:${rez.mandati > 0 ? '#38a169' : '#cbd5e0'};">${rez.mandati} ${deklinacijaClanova(rez.mandati)}</span>
                 </div>
             </div>
         `;
